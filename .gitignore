@@ -1,0 +1,9 @@
+# Vendor directory
+vendor
+
+# Composer PHAR
+composer.phar
+
+.idea/
+
+.phpunit.result.cache

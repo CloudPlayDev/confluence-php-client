@@ -1,0 +1,23 @@
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+name: CodeQuality
+
+jobs:
+  phpstan:
+    name: PHPStan
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: php-actions/composer@v5
+
+      - name: PHPStan Static Analysis
+        uses: php-actions/phpstan@v3
+        with:
+          path: src/
+          php_version: 7.4
