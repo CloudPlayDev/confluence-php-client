@@ -33,7 +33,7 @@ class Curl
     {
         $ch = curl_init($host);
 
-        if(!is_resource($ch)) {
+        if (!is_resource($ch)) {
             throw new Exception('Connection could not be established.');
         }
 
@@ -45,6 +45,12 @@ class Curl
             CURLOPT_USERPWD => $username . ':' . $password
         ]);
     }
+
+    public function __destruct()
+    {
+        $this->close();
+    }
+
 
     /**
      * Get host url
@@ -87,7 +93,12 @@ class Curl
      */
     public function execute()
     {
-        return curl_exec($this->curl);
+        $result = curl_exec($this->curl);
+        if ($result === false) {
+            throw new Exception(curl_error($this->curl) . curl_errno($this->curl));
+        }
+
+        return $result;
     }
 
     /**
@@ -115,26 +126,6 @@ class Curl
     public function getInfo(int $name)
     {
         return curl_getinfo($this->curl, $name);
-    }
-
-    /**
-     * Get errors from the request
-     *
-     * @return string
-     */
-    public function getError(): string
-    {
-        return curl_error($this->curl);
-    }
-
-    /**
-     * Get error number
-     *
-     * @return int
-     */
-    public function getErrorNumber(): int
-    {
-        return curl_errno($this->curl);
     }
 
     /**

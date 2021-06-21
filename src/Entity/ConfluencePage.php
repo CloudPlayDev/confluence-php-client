@@ -11,51 +11,30 @@ namespace CloudPlayDev\ConfluenceClient\Entity;
 
 class ConfluencePage
 {
-    /**
-     * @var string $id
-     */
-    private string $id;
-    /**
-     * @var string $title
-     */
-    private string $title = '';
-    /**
-     * @var string $space
-     */
-    private string $space = '';
+    private ?string $id = null;
+    private ?string $title = null;
+    private ?string $space = null;
+
     /**
      * @var array<string, string> $ancestors
      */
     private array $ancestors = [];
-    /**
-     * @var string $content
-     */
-    private string $content = '';
-    /**
-     * @var int $version
-     */
-    private int $version;
+
+    private ?string $content = null;
+
+    private ?int $version = null;
     /**
      * @var array<string, string> $children
      */
     private array $children = [];
-    /**
-     * @var string $url
-     */
-    private string $url;
-    /**
-     * @var string
-     */
-    private string $type = '';
-    /**
-     * @var mixed
-     */
-    private $createdDate;
+    private ?string $url = null;
+    private ?string $type = null;
+    private ?string $createdDate = null;
 
     /**
-     * @return string
+     * @return null|string
      */
-    public function getType(): string
+    public function getType(): ?string
     {
         return $this->type;
     }
@@ -88,7 +67,7 @@ class ConfluencePage
         return $this;
     }
 
-    public function getTitle(): string
+    public function getTitle(): ?string
     {
         return $this->title;
     }
@@ -104,9 +83,9 @@ class ConfluencePage
     }
 
     /**
-     * @return string
+     * @return null|string
      */
-    public function getSpace(): string
+    public function getSpace(): ?string
     {
         return $this->space;
     }
@@ -140,9 +119,9 @@ class ConfluencePage
     }
 
     /**
-     * @return string
+     * @return null|string
      */
-    public function getContent(): string
+    public function getContent(): ?string
     {
         return $this->content;
     }
@@ -158,9 +137,9 @@ class ConfluencePage
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getVersion(): int
+    public function getVersion(): ?int
     {
         return $this->version;
     }
@@ -178,7 +157,7 @@ class ConfluencePage
     /**
      * @return array<string, string>
      */
-    public function getChildren()
+    public function getChildren(): array
     {
         return $this->children;
     }
@@ -194,9 +173,9 @@ class ConfluencePage
     }
 
     /**
-     * @return string
+     * @return null|string
      */
-    public function getUrl(): string
+    public function getUrl(): ?string
     {
         return $this->url;
     }
@@ -220,10 +199,10 @@ class ConfluencePage
     }
 
     /**
-     * @param mixed $createdDate
+     * @param string $createdDate
      * @return ConfluencePage
      */
-    public function setCreatedDate($createdDate): ConfluencePage
+    public function setCreatedDate(string $createdDate): ConfluencePage
     {
         $this->createdDate = $createdDate;
         return $this;

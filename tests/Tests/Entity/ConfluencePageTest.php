@@ -23,7 +23,7 @@ class ConfluencePageTest extends TestCase
     public function testGetSpace(): void
     {
         $confluencePage = new ConfluencePage();
-        self::assertSame('', $confluencePage->getSpace());
+        self::assertNull($confluencePage->getSpace());
     }
 
     /**

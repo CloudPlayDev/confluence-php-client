@@ -10,7 +10,9 @@ declare(strict_types=1);
 namespace CloudPlayDev\ConfluenceClient;
 
 use CloudPlayDev\ConfluenceClient\Entity\ConfluencePage;
+use InvalidArgumentException;
 use function in_array;
+use function is_array;
 
 class Client
 {
@@ -84,7 +86,7 @@ class Client
      * Delete a page
      *
      * @param string $id
-     * @return null
+     * @return mixed
      * @throws Exception
      */
     public function deletePage(string $id)
@@ -175,7 +177,7 @@ class Client
      * @param mixed[] $data
      * @param array<string, string> $headers
      *
-     * @return mixed
+     * @return string|false
      *
      * @throws Exception
      */
@@ -200,10 +202,10 @@ class Client
         $serverOutput = $this->curl->execute();
         $this->curl->close();
 
-        if (!$serverOutput) {
-            throw new Exception('Error: "' . $this->curl->getError() . '" - Code: ' . $this->curl->getErrorNumber());
-        } else {
-            return json_encode($serverOutput, JSON_THROW_ON_ERROR);
+        if (!is_scalar($serverOutput) && !is_array($serverOutput)) {
+            throw new InvalidArgumentException('Unexpected return value');
         }
+
+        return json_encode($serverOutput, JSON_THROW_ON_ERROR);
     }
 }
