@@ -1,7 +1,7 @@
 {
   "name": "cloudplaydev/confluence-php-client",
   "description": "Confluence API PHP Client",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "license": "MIT",
   "keywords": [
     "Atlassian",
@@ -12,10 +12,6 @@
   ],
   "authors": [
     {
-      "name": "Yuxiao (Shawn) Tan",
-      "email": "yuxiaota@gmail.com"
-    },
-    {
       "name": "Artem Stepin",
       "email": "stepin.artem@gmail.com"
     }
@@ -24,7 +20,13 @@
   "autoload": {
     "psr-4": {
       "CloudPlayDev\\ConfluenceClient\\": [
-        "src/",
+        "src/"
+      ]
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "CloudPlayDev\\Tests\\ConfluenceClient\\": [
         "tests/"
       ]
     }
@@ -32,11 +34,22 @@
   "require": {
     "php": "^7.4",
     "ext-curl": "*",
-    "ext-json": "*"
+    "ext-json": "*",
+    "psr/http-message": "^1.0",
+    "psr/http-client": "^1.0",
+    "psr/http-client-implementation": "^1.0",
+    "psr/http-factory": "^1.0",
+    "php-http/httplug": "^2.0",
+    "php-http/discovery": "^1.0",
+    "php-http/promise": "^1.0",
+    "php-http/client-common": "^2.0"
   },
   "require-dev": {
+    "roave/security-advisories": "dev-latest",
     "phpunit/phpunit": "^9.5.5",
     "phpstan/phpstan": "^0.12.90",
-    "vimeo/psalm": "^4.8"
+    "vimeo/psalm": "^4.8",
+    "guzzlehttp/guzzle": "^7.2",
+    "http-interop/http-factory-guzzle": "^1.0"
   }
 }

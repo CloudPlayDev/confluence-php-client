@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace CloudPlayDev\ConfluenceClient\Entity;
 
-class ConfluencePage
+class Content
 {
     private ?int $id = null;
     private ?string $title = null;
@@ -41,9 +41,9 @@ class ConfluencePage
 
     /**
      * @param string $type
-     * @return ConfluencePage
+     * @return Content
      */
-    public function setType(string $type): ConfluencePage
+    public function setType(string $type): Content
     {
         $this->type = $type;
         return $this;
@@ -59,9 +59,9 @@ class ConfluencePage
 
     /**
      * @param int $id
-     * @return ConfluencePage
+     * @return Content
      */
-    public function setId(int $id): ConfluencePage
+    public function setId(int $id): Content
     {
         $this->id = $id;
         return $this;
@@ -74,9 +74,9 @@ class ConfluencePage
 
     /**
      * @param string $title
-     * @return ConfluencePage
+     * @return Content
      */
-    public function setTitle(string $title): ConfluencePage
+    public function setTitle(string $title): Content
     {
         $this->title = $title;
         return $this;
@@ -92,9 +92,9 @@ class ConfluencePage
 
     /**
      * @param string $space
-     * @return ConfluencePage
+     * @return Content
      */
-    public function setSpace(string $space): ConfluencePage
+    public function setSpace(string $space): Content
     {
         $this->space = $space;
         return $this;
@@ -110,9 +110,9 @@ class ConfluencePage
 
     /**
      * @param array<string, string> $ancestors
-     * @return ConfluencePage
+     * @return Content
      */
-    public function setAncestors(array $ancestors): ConfluencePage
+    public function setAncestors(array $ancestors): Content
     {
         $this->ancestors = $ancestors;
         return $this;
@@ -128,9 +128,9 @@ class ConfluencePage
 
     /**
      * @param string $content
-     * @return ConfluencePage
+     * @return Content
      */
-    public function setContent(string $content): ConfluencePage
+    public function setContent(string $content): Content
     {
         $this->content = $content;
         return $this;
@@ -146,9 +146,9 @@ class ConfluencePage
 
     /**
      * @param int $version
-     * @return ConfluencePage
+     * @return Content
      */
-    public function setVersion(int $version): ConfluencePage
+    public function setVersion(int $version): Content
     {
         $this->version = $version;
         return $this;
@@ -164,9 +164,9 @@ class ConfluencePage
 
     /**
      * @param array<string, string> $children
-     * @return ConfluencePage
+     * @return Content
      */
-    public function setChildren(array $children): ConfluencePage
+    public function setChildren(array $children): Content
     {
         $this->children = $children;
         return $this;
@@ -182,9 +182,9 @@ class ConfluencePage
 
     /**
      * @param string $url
-     * @return ConfluencePage
+     * @return Content
      */
-    public function setUrl(string $url): ConfluencePage
+    public function setUrl(string $url): Content
     {
         $this->url = $url;
         return $this;
@@ -200,9 +200,9 @@ class ConfluencePage
 
     /**
      * @param string $createdDate
-     * @return ConfluencePage
+     * @return Content
      */
-    public function setCreatedDate(string $createdDate): ConfluencePage
+    public function setCreatedDate(string $createdDate): Content
     {
         $this->createdDate = $createdDate;
         return $this;

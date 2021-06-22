@@ -7,22 +7,22 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace CloudPlayDev\ConfluenceClient\Tests\Entity;
+namespace CloudPlayDev\Tests\ConfluenceClient\Entity;
 
-use CloudPlayDev\ConfluenceClient\Entity\ConfluencePage;
+use CloudPlayDev\ConfluenceClient\Entity\Content;
 use PHPUnit\Framework\TestCase;
 
 /**
  * Class ConfluencePageModelTest
  */
-class ConfluencePageTest extends TestCase
+class ContentTest extends TestCase
 {
     /**
      * Test get space
      */
     public function testGetSpace(): void
     {
-        $confluencePage = new ConfluencePage();
+        $confluencePage = new Content();
         self::assertNull($confluencePage->getSpace());
     }
 
@@ -31,8 +31,8 @@ class ConfluencePageTest extends TestCase
      */
     public function testSetSpace(): void
     {
-        self::assertClassHasAttribute('space', ConfluencePage::class);
-        $confluencePage = new ConfluencePage();
+        self::assertClassHasAttribute('space', Content::class);
+        $confluencePage = new Content();
         $confluencePage->setSpace('TEST');
         static::assertSame('TEST', $confluencePage->getSpace());
     }
@@ -42,8 +42,8 @@ class ConfluencePageTest extends TestCase
      */
     public function testSetId(): void
     {
-        self::assertClassHasAttribute('id', ConfluencePage::class);
-        $confluencePage = new ConfluencePage();
+        self::assertClassHasAttribute('id', Content::class);
+        $confluencePage = new Content();
         $confluencePage->setId(123);
         self::assertSame(123, $confluencePage->getId());
     }
