@@ -24,11 +24,11 @@ use CloudPlayDev\ConfluenceClient\Curl;
 use CloudPlayDev\ConfluenceClient\Entity\ConfluencePage;
 
 //Create and configure a curl web client
-$curl = new Curl('confluence_host_url','username','password');
+$httpClient = new Curl('confluence_host_url','username','password');
 // $curl = new CurlTokenAuth('confluence_host_url','NjU9OTXA4NDI2MRY5OkBznOUO8YjaUF7KoOruZRXhILJ9');
 
 //Create the Confluence Client
-$client = new Client($curl);
+$client = new Client($httpClient);
 
 //Create a confluence page
 $page = new ConfluencePage();
@@ -40,10 +40,16 @@ $page->setSpace('testSpaceKey')->setTitle('Test')->setContent('<p>test page</p>'
 $client->createPage($page);
 
 //Get the page we created
-$client->selectPageBy([
+$createdPage = $client->selectPageBy([
     'spaceKey' => 'testSpaceKey',
     'title' => 'Test'
 ]);
+
+//Update page content
+$createdPage->setContent('some new content');
+$client->updatePage($createdPage);
+
+
 
 ```
 
