@@ -10,7 +10,7 @@ An Object Oriented wrapper for Confluence
 ## Installation
 
 ```bash
-$ php composer.phar require cloudplaydev/confluence-php-client
+$ composer require cloudplaydev/confluence-php-client
 ```
 
 ## Usage
