@@ -40,6 +40,16 @@ class Content extends AbstractApi
     public const CONTENT_TYPE_PAGE = 'page';
 
     /**
+     * ContentType for confluence global content
+     */
+    public const CONTENT_TYPE_GLOBAL = 'global';
+
+    /**
+     * default value for expand query parameter
+     */
+    private const DEFAULT_EXPAND = 'space,version,body.storage,container';
+
+    /**
      * @param string|int|null ...$parameter
      * @return string
      */
@@ -65,7 +75,7 @@ class Content extends AbstractApi
      */
     public function findOneById(int $contentId): AbstractContent
     {
-        $response = $this->get(self::getContentUri($contentId), ['expand' => 'space,version,body.storage']);
+        $response = $this->get(self::getContentUri($contentId), ['expand' => self::DEFAULT_EXPAND]);
 
         if ($response->getStatusCode() !== 200) {
             throw new RequestException($response);
@@ -75,30 +85,30 @@ class Content extends AbstractApi
     }
 
     /**
-     * @param AbstractContent $page
+     * @param AbstractContent $content
      * @return ResponseInterface
      * @throws Exception
      * @throws JsonException
      * @throws HttpClientException
      */
-    public function update(AbstractContent $page): ResponseInterface
+    public function update(AbstractContent $content): ResponseInterface
     {
-        $contentId = $page->getId();
+        $contentId = $content->getId();
         if (null === $contentId) {
-            throw new Exception('Only saved pages can be updated.');
+            throw new Exception('Only saved content can be updated.');
         }
         $data = [
             'id' => $contentId,
-            'type' => $page->getType(),
-            'title' => $page->getTitle(),
-            'space' => ['key' => $page->getSpace()],
+            'type' => $content->getType(),
+            'title' => $content->getTitle(),
+            'space' => ['key' => $content->getSpace()],
             'body' => [
                 'storage' => [
-                    'value' => $page->getContent(),
+                    'value' => $content->getContent(),
                     'representation' => 'storage',
                 ],
             ],
-            'version' => ['number' => $page->getVersion() + 1]
+            'version' => ['number' => $content->getVersion() + 1]
         ];
 
         return $this->put(self::getContentUri($contentId), $data);
@@ -106,29 +116,37 @@ class Content extends AbstractApi
     }
 
     /**
-     * @param AbstractContent $page
+     * @param AbstractContent $content
      * @return AbstractContent
      * @throws Exception
      * @throws HttpClientException
      * @throws JsonException
      */
-    public function create(AbstractContent $page): AbstractContent
+    public function create(AbstractContent $content): AbstractContent
     {
-        if (null !== $page->getId()) {
+        if (null !== $content->getId()) {
             throw new Exception('Only new pages can be created.');
         }
 
         $data = [
-            'type' => $page->getType(),
-            'title' => $page->getTitle(),
-            'space' => ['key' => $page->getSpace()],
+            'type' => $content->getType(),
+            'title' => $content->getTitle(),
+            'space' => ['key' => $content->getSpace()],
             'body' => [
                 'storage' => [
-                    'value' => $page->getContent(),
+                    'value' => $content->getContent(),
                     'representation' => 'storage',
                 ],
             ],
         ];
+
+        /* attach content to content */
+        if(null !== $content->getContainerId()) {
+            $data['container'] = [
+                'id' => $content->getContainerId(),
+                'type' => $content->getContainerType(),
+            ];
+        }
 
         $response = $this->post(self::getContentUri(), $data);
 
@@ -141,16 +159,16 @@ class Content extends AbstractApi
     }
 
     /**
-     * @param AbstractContent $page
+     * @param AbstractContent $content
      * @return ResponseInterface
      */
-    public function remove(AbstractContent $page): ResponseInterface
+    public function remove(AbstractContent $content): ResponseInterface
     {
-        $contentId = $page->getId();
+        $contentId = $content->getId();
         if (null === $contentId) {
             throw new Exception('Only saved pages can be removed.');
         }
-        return $this->put(self::getContentUri($contentId));
+        return $this->delete(self::getContentUri($contentId));
     }
 
     /**
@@ -165,7 +183,7 @@ class Content extends AbstractApi
         return $this->parseSearchResults(
             $this->get(
                 self::getContentUri($content->getId(), 'child', $contentType),
-                ['expand' => 'space,version,body.storage']
+                ['expand' => self::DEFAULT_EXPAND]
             ),
         );
     }
@@ -195,7 +213,7 @@ class Content extends AbstractApi
             return in_array($searchKey, $allowedSearchParameter, true);
         }, ARRAY_FILTER_USE_KEY);
 
-        $queryParameter['expand'] = 'space,version,body.storage';
+        $queryParameter['expand'] = self::DEFAULT_EXPAND;
 
         $searchResponse = $this->get('content?', $queryParameter);
 
@@ -280,7 +298,6 @@ class Content extends AbstractApi
         }
 
         $content->setId((int)$decodedData['id']);
-        $content->setType($decodedData['type']);
         $content->setTitle((string)$decodedData['title']);
         $content->setUrl((string)$decodedData['_links']['self']);
         if (isset($decodedData['space']['key'])) {
@@ -289,8 +306,9 @@ class Content extends AbstractApi
         if (isset($decodedData['version']['number'])) {
             $content->setVersion((int)$decodedData['version']['number']);
         }
-        if(isset($decodedData['body']['storage']['value'])) {
-            $content->setContent($decodedData['body']['storage']['value']);
+        if(isset($decodedData['body']['storage']['value']) ) {
+            assert(is_array($decodedData['body']['storage']));
+            $content->setContent((string)$decodedData['body']['storage']['value']);
         }
 
         return $content;

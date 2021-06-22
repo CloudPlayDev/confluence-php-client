@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace CloudPlayDev\ConfluenceClient\Entity;
 
 
+use CloudPlayDev\ConfluenceClient\Api\Content;
+
 abstract class AbstractContent
 {
     private ?int $id = null;
@@ -18,12 +20,15 @@ abstract class AbstractContent
      */
     private array $children = [];
     private ?string $url = null;
-    private ?string $type = null;
+    protected string $type = Content::CONTENT_TYPE_GLOBAL;
+
+    private ?int $containerId = null;
+    private string $containerType = Content::CONTENT_TYPE_PAGE;
 
     /**
-     * @return null|string
+     * @return string
      */
-    public function getType(): ?string
+    public function getType(): string
     {
         return $this->type;
     }
@@ -160,4 +165,65 @@ abstract class AbstractContent
         $this->url = $url;
         return $this;
     }
+
+    /**
+     * @param string $comment
+     * @return ContentComment
+     */
+    public function createComment(string $comment): ContentComment
+    {
+        $contentComment = new ContentComment();
+        $contentComment->setContainerId($this->getId());
+        $contentComment->setContainerType($this->getType());
+        $contentComment->setContent($comment);
+        return $contentComment;
+    }
+
+    /**
+     * @param string $title
+     * @param string $body
+     * @return ContentPage
+     */
+    public function createSubpage(string $title, string $body): ContentPage
+    {
+        $contentPage = new ContentPage();
+        $contentPage->setContainerId($this->getId());
+        $contentPage->setContainerType($this->getType());
+        $contentPage->setContent($body);
+        $contentPage->setTitle($title);
+        return $contentPage;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getContainerId(): ?int
+    {
+        return $this->containerId;
+    }
+
+    /**
+     * @param int|null $containerId
+     */
+    public function setContainerId(?int $containerId): void
+    {
+        $this->containerId = $containerId;
+    }
+
+    /**
+     * @return string
+     */
+    public function getContainerType(): string
+    {
+        return $this->containerType;
+    }
+
+    /**
+     * @param string $containerType
+     */
+    public function setContainerType(string $containerType): void
+    {
+        $this->containerType = $containerType;
+    }
+
 }

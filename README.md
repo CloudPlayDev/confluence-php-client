@@ -53,6 +53,16 @@ $client->content()->update($createdPage);
 //get child content
 $childContent = $client->content()->children($createdPage, Content::CONTENT_TYPE_PAGE);
 
+//create a comment
+$commentContent = $createdPage->createComment('test comment');
+$createdComment = $client->content()->create($commentContent);
+
+//update a comment
+$createdComment->setContent('new comment');
+$client->content()->update($createdComment);
+
+//delete a content 
+$client->content()->remove($createdComment);
 
 
 ```
