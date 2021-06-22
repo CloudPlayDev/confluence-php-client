@@ -11,8 +11,11 @@ namespace CloudPlayDev\ConfluenceClient;
 
 use CloudPlayDev\ConfluenceClient\Entity\ConfluencePage;
 use InvalidArgumentException;
+use CloudPlayDev\ConfluenceClient\Exception\Exception;
+use function count;
 use function in_array;
 use function is_array;
+use function is_string;
 
 class Client
 {
@@ -52,7 +55,7 @@ class Client
             ],
         ];
 
-        return $this->request('GET', $this->curl->getHost() . '/content', $data);
+        return $this->request('GET', $this->curl->getHost() . '/rest/api/content', $data);
     }
 
 
@@ -76,10 +79,10 @@ class Client
                     'representation' => 'storage',
                 ],
             ],
-            'version' => ['number' => $page->getVersion()]
+            'version' => ['number' => $page->getVersion()+1]
         ];
 
-        return $this->request('POST', $this->curl->getHost() . "/content/{$page->getId()}", $data);
+        return $this->request('PUT', $this->curl->getHost() . "/rest/api/content/{$page->getId()}", $data);
     }
 
     /**
@@ -91,18 +94,18 @@ class Client
      */
     public function deletePage(string $id)
     {
-        return $this->request('DELETE', $this->curl->getHost() . "/content/$id");
+        return $this->request('DELETE', $this->curl->getHost() . "/rest/api/content/$id");
     }
 
     /**
      * Search page by title, space key, type or id
      * @param array<string, string> $parameters
-     * @return mixed
+     * @return ConfluencePage|null
      * @throws Exception
      */
-    public function selectPageBy(array $parameters = [])
+    public function selectPageBy(array $parameters = []): ?ConfluencePage
     {
-        $url = $this->curl->getHost() . '/content?';
+        $url = $this->curl->getHost() . '/rest/api/content?';
         if (isset($parameters['title'])) {
             $url .= "title={$parameters['title']}&";
         }
@@ -113,13 +116,46 @@ class Client
             $url .= "type={$parameters['type']}&";
         }
         if (isset($parameters['id'])) {
-            $url = $this->curl->getHost() . '/content/' . $parameters['id'] . '?';
+            return $this->getPageById((int)$parameters['id']);
         }
         if (isset($parameters['expand'])) {
             $url .= 'expand=' . $parameters['expand'];
         }
 
-        return $this->request('GET', $url);
+        $searchResponse = $this->request('GET', $url);
+
+        if (is_array($searchResponse) && isset($searchResponse['results'], $searchResponse['size']) && is_array($searchResponse['results']) && $searchResponse['size'] >= 1 && count($searchResponse['results']) >= 1) {
+            $firstPage = (array)reset($searchResponse['results']);
+            if (isset($firstPage['id'])) {
+                return $this->getPageById((int)$firstPage['id']);
+            }
+        }
+        return null;
+    }
+
+    public function getPageById(int $pageId): ?ConfluencePage
+    {
+        $url = $this->curl->getHost() . '/rest/api/content/'.$pageId;
+        $firstPage = $this->request('GET', $url);
+
+        if (!isset($firstPage['id'],
+            $firstPage['type'],
+            $firstPage['title'],
+            $firstPage['_links']['self'],
+            $firstPage['space']['key'],
+            $firstPage['version']['number'])
+        ) {
+            return null;
+        }
+
+        $page = new ConfluencePage();
+        $page->setId((int)$firstPage['id']);
+        $page->setType((string)$firstPage['type']);
+        $page->setTitle((string)$firstPage['title']);
+        $page->setUrl((string)$firstPage['_links']['self']);
+        $page->setSpace(str_replace('/rest/api/space/', '', (string)$firstPage['space']['key']));
+        $page->setVersion((int)$firstPage['version']['number']);
+        return $page;
     }
 
     /**
@@ -140,7 +176,7 @@ class Client
         ];
         return $this->request(
             'POST',
-            $this->curl->getHost() . "/content/$parentPageId/child/attachment",
+            $this->curl->getHost() . "/rest/api/content/$parentPageId/child/attachment",
             $data,
             $headers
         );
@@ -155,7 +191,7 @@ class Client
      */
     public function selectAttachments(string $pageId)
     {
-        return $this->request('GET', $this->curl->getHost() . "/content/$pageId/child/attachment");
+        return $this->request('GET', $this->curl->getHost() . "/rest/api/content/$pageId/child/attachment");
     }
 
     /**
@@ -166,7 +202,7 @@ class Client
      */
     public function addLabel(string $pageId, array $labels)
     {
-        return $this->request('POST', $this->curl->getHost() . "/content/$pageId/label", $labels);
+        return $this->request('POST', $this->curl->getHost() . "/rest/api/content/$pageId/label", $labels);
     }
 
     /**
@@ -177,11 +213,11 @@ class Client
      * @param mixed[] $data
      * @param array<string, string> $headers
      *
-     * @return string|false
+     * @return mixed[]|null
      *
      * @throws Exception
      */
-    public function request(string $method, string $url, array $data = [], array $headers = ['Content-Type' => 'application/json'])
+    public function request(string $method, string $url, array $data = [], array $headers = ['Content-Type' => 'application/json']): ?array
     {
         //Detect invalid method
         $method = strtoupper($method);
@@ -196,16 +232,25 @@ class Client
         ])->setHeaders($headers);
 
         if ($data !== []) {
-            $this->curl->setOption(CURLOPT_POSTFIELDS, $data);
+            $this->curl->setOption(CURLOPT_POSTFIELDS, json_encode($data, JSON_THROW_ON_ERROR));
         }
 
         $serverOutput = $this->curl->execute();
-        $this->curl->close();
 
-        if (!is_scalar($serverOutput) && !is_array($serverOutput)) {
+        if (!is_string($serverOutput)) {
             throw new InvalidArgumentException('Unexpected return value');
         }
 
-        return json_encode($serverOutput, JSON_THROW_ON_ERROR);
+        if(empty($serverOutput)) {
+            return null;
+        }
+
+        $decodedData = json_decode($serverOutput, true, 512, JSON_THROW_ON_ERROR);
+
+        if (!is_array($decodedData)) {
+            throw new InvalidArgumentException('Return value could not be decoded.');
+        }
+
+        return $decodedData;
     }
 }

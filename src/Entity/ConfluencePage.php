@@ -11,7 +11,7 @@ namespace CloudPlayDev\ConfluenceClient\Entity;
 
 class ConfluencePage
 {
-    private ?string $id = null;
+    private ?int $id = null;
     private ?string $title = null;
     private ?string $space = null;
 
@@ -22,7 +22,7 @@ class ConfluencePage
 
     private ?string $content = null;
 
-    private ?int $version = null;
+    private int $version = 1;
     /**
      * @var array<string, string> $children
      */
@@ -50,18 +50,18 @@ class ConfluencePage
     }
 
     /**
-     * @return mixed
+     * @return int|null
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
     /**
-     * @param string $id
+     * @param int $id
      * @return ConfluencePage
      */
-    public function setId(string $id): ConfluencePage
+    public function setId(int $id): ConfluencePage
     {
         $this->id = $id;
         return $this;
@@ -137,9 +137,9 @@ class ConfluencePage
     }
 
     /**
-     * @return int|null
+     * @return int
      */
-    public function getVersion(): ?int
+    public function getVersion(): int
     {
         return $this->version;
     }

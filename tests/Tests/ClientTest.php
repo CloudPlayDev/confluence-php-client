@@ -12,7 +12,7 @@ namespace CloudPlayDev\ConfluenceClient\Tests;
 use CloudPlayDev\ConfluenceClient\Client;
 use CloudPlayDev\ConfluenceClient\Curl;
 use CloudPlayDev\ConfluenceClient\Entity\ConfluencePage;
-use CloudPlayDev\ConfluenceClient\Exception;
+use CloudPlayDev\ConfluenceClient\Exception\Exception;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -28,21 +28,21 @@ class ClientTest extends TestCase
         $url = 'some/url';
         $username = 'username';
         $password = 'password';
-        $curl =  $this->getMockBuilder(Curl::class)
-            ->setConstructorArgs([$url,$username,$password])
+        $curl = $this->getMockBuilder(Curl::class)
+            ->setConstructorArgs([$url, $username, $password])
             ->getMock();
         $curl->expects(self::once())
             ->method('setOptions')
             ->willReturnSelf();
         $curl->expects(self::once())
             ->method('execute')
-            ->willReturn(['result'=>true]);
+            ->willReturn('{"result":true}');
         $client = new Client($curl);
         $page = new ConfluencePage();
         $response = $client->createPage($page);
 
-        static::assertIsString($response);
-        self::assertEquals('{"result":true}',$response);
+        static::assertIsArray($response);
+        self::assertEquals(['result' => true], $response);
     }
 
     /**
@@ -53,19 +53,18 @@ class ClientTest extends TestCase
         $url = 'some/url';
         $username = 'username';
         $password = 'password';
-        $curl =  $this->getMockBuilder(Curl::class)
-            ->setConstructorArgs([$url,$username,$password])
+        $curl = $this->getMockBuilder(Curl::class)
+            ->setConstructorArgs([$url, $username, $password])
             ->getMock();
         $curl->expects(self::once())
             ->method('setOptions')
             ->willReturnSelf();
         $curl->expects(self::once())
             ->method('execute')
-            ->willReturn(['result'=>true]);
-        $response = (new Client($curl))->selectPageBy(['title'=>'test']);
+            ->willReturn('{"result":true}');
+        $response = (new Client($curl))->selectPageBy(['title' => 'test']);
 
-        self::assertIsString($response);
-        self::assertEquals('{"result":true}',$response);
+        self::assertNull($response);
     }
 
     /**
@@ -76,8 +75,8 @@ class ClientTest extends TestCase
         $url = 'some/url';
         $username = 'username';
         $password = 'password';
-        $curl =  $this->getMockBuilder(Curl::class)
-            ->setConstructorArgs([$url,$username,$password])
+        $curl = $this->getMockBuilder(Curl::class)
+            ->setConstructorArgs([$url, $username, $password])
             ->getMock();
         $curl->expects(self::once())
             ->method('setOptions')
@@ -87,11 +86,11 @@ class ClientTest extends TestCase
             ->willReturnSelf();
         $curl->expects(self::once())
             ->method('execute')
-            ->willReturn(['result'=>true]);
-        $response = (new Client($curl))->request('POST',$url,['id'=>123]);
+            ->willReturn('{"result":true}');
+        $response = (new Client($curl))->request('POST', $url, ['id' => 123]);
 
-        self::assertIsString($response);
-        self::assertEquals('{"result":true}',$response);
+        self::assertIsArray($response);
+        self::assertEquals(['result'=>true], $response);
     }
 
     /**
@@ -104,8 +103,8 @@ class ClientTest extends TestCase
         $url = 'some/url';
         $username = 'username';
         $password = 'password';
-        $curl =  $this->getMockBuilder(Curl::class)
-            ->setConstructorArgs([$url,$username,$password])
+        $curl = $this->getMockBuilder(Curl::class)
+            ->setConstructorArgs([$url, $username, $password])
             ->getMock();
         $curl
             ->method('setOptions')
@@ -115,8 +114,8 @@ class ClientTest extends TestCase
             ->willReturnSelf();
         $curl
             ->method('execute')
-            ->willReturn(['result'=>true]);
+            ->willReturn(['result' => true]);
         $client = new Client($curl);
-        $client->request('TEST',$url,['id'=>123]);
+        $client->request('TEST', $url, ['id' => 123]);
     }
 }

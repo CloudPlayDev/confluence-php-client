@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace CloudPlayDev\ConfluenceClient;
 
+use CloudPlayDev\ConfluenceClient\Exception\Exception;
 use function is_resource;
 
 /**
@@ -38,11 +39,12 @@ class Curl
         }
 
         $this->curl = $ch;
-
         $this->hostUrl = $host;
-        curl_setopt_array($this->curl, [
+
+        $this->setOptions([
             CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
-            CURLOPT_USERPWD => $username . ':' . $password
+            CURLOPT_USERPWD => $username . ':' . $password,
+            CURLINFO_HEADER_OUT => true,
         ]);
     }
 
@@ -98,6 +100,12 @@ class Curl
             throw new Exception(curl_error($this->curl) . curl_errno($this->curl));
         }
 
+        $responseCode = (int)curl_getinfo($this->curl, CURLINFO_RESPONSE_CODE);
+
+        if($responseCode !== 200) {
+            throw new Exception('Response code: ' . $responseCode . ' ( ' . $result . ' )');
+        }
+
         return $result;
     }
 
@@ -133,7 +141,7 @@ class Curl
      *
      * @return $this
      */
-    public function close(): Curl
+    private function close(): Curl
     {
         curl_close($this->curl);
         return $this;

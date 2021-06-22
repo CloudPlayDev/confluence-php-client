@@ -44,8 +44,8 @@ class ConfluencePageTest extends TestCase
     {
         self::assertClassHasAttribute('id', ConfluencePage::class);
         $confluencePage = new ConfluencePage();
-        $confluencePage->setId('123');
-        self::assertSame('123', $confluencePage->getId());
+        $confluencePage->setId(123);
+        self::assertSame(123, $confluencePage->getId());
     }
 
 }
