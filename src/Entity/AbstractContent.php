@@ -1,24 +1,14 @@
 <?php
 declare(strict_types=1);
-/**
- * This file is part of the cloudplaydev/confluencePHPClient.
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
 
 namespace CloudPlayDev\ConfluenceClient\Entity;
 
-class Content
+
+abstract class AbstractContent
 {
     private ?int $id = null;
     private ?string $title = null;
     private ?string $space = null;
-
-    /**
-     * @var array<string, string> $ancestors
-     */
-    private array $ancestors = [];
 
     private ?string $content = null;
 
@@ -29,7 +19,6 @@ class Content
     private array $children = [];
     private ?string $url = null;
     private ?string $type = null;
-    private ?string $createdDate = null;
 
     /**
      * @return null|string
@@ -41,9 +30,9 @@ class Content
 
     /**
      * @param string $type
-     * @return Content
+     * @return self
      */
-    public function setType(string $type): Content
+    public function setType(string $type): self
     {
         $this->type = $type;
         return $this;
@@ -59,9 +48,9 @@ class Content
 
     /**
      * @param int $id
-     * @return Content
+     * @return self
      */
-    public function setId(int $id): Content
+    public function setId(int $id): self
     {
         $this->id = $id;
         return $this;
@@ -74,9 +63,9 @@ class Content
 
     /**
      * @param string $title
-     * @return Content
+     * @return self
      */
-    public function setTitle(string $title): Content
+    public function setTitle(string $title): self
     {
         $this->title = $title;
         return $this;
@@ -92,29 +81,11 @@ class Content
 
     /**
      * @param string $space
-     * @return Content
+     * @return self
      */
-    public function setSpace(string $space): Content
+    public function setSpace(string $space): self
     {
         $this->space = $space;
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getAncestors()
-    {
-        return $this->ancestors;
-    }
-
-    /**
-     * @param array<string, string> $ancestors
-     * @return Content
-     */
-    public function setAncestors(array $ancestors): Content
-    {
-        $this->ancestors = $ancestors;
         return $this;
     }
 
@@ -128,9 +99,9 @@ class Content
 
     /**
      * @param string $content
-     * @return Content
+     * @return self
      */
-    public function setContent(string $content): Content
+    public function setContent(string $content): self
     {
         $this->content = $content;
         return $this;
@@ -146,9 +117,9 @@ class Content
 
     /**
      * @param int $version
-     * @return Content
+     * @return self
      */
-    public function setVersion(int $version): Content
+    public function setVersion(int $version): self
     {
         $this->version = $version;
         return $this;
@@ -164,9 +135,9 @@ class Content
 
     /**
      * @param array<string, string> $children
-     * @return Content
+     * @return self
      */
-    public function setChildren(array $children): Content
+    public function setChildren(array $children): self
     {
         $this->children = $children;
         return $this;
@@ -182,29 +153,11 @@ class Content
 
     /**
      * @param string $url
-     * @return Content
+     * @return self
      */
-    public function setUrl(string $url): Content
+    public function setUrl(string $url): self
     {
         $this->url = $url;
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getCreatedDate()
-    {
-        return $this->createdDate;
-    }
-
-    /**
-     * @param string $createdDate
-     * @return Content
-     */
-    public function setCreatedDate(string $createdDate): Content
-    {
-        $this->createdDate = $createdDate;
         return $this;
     }
 }

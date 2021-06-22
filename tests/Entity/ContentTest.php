@@ -9,7 +9,8 @@ declare(strict_types=1);
 
 namespace CloudPlayDev\Tests\ConfluenceClient\Entity;
 
-use CloudPlayDev\ConfluenceClient\Entity\Content;
+use CloudPlayDev\ConfluenceClient\Entity\AbstractContent;
+use CloudPlayDev\ConfluenceClient\Entity\ContentPage;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -22,7 +23,7 @@ class ContentTest extends TestCase
      */
     public function testGetSpace(): void
     {
-        $confluencePage = new Content();
+        $confluencePage = new ContentPage();
         self::assertNull($confluencePage->getSpace());
     }
 
@@ -31,8 +32,8 @@ class ContentTest extends TestCase
      */
     public function testSetSpace(): void
     {
-        self::assertClassHasAttribute('space', Content::class);
-        $confluencePage = new Content();
+        self::assertClassHasAttribute('space', AbstractContent::class);
+        $confluencePage = new ContentPage();
         $confluencePage->setSpace('TEST');
         static::assertSame('TEST', $confluencePage->getSpace());
     }
@@ -42,8 +43,8 @@ class ContentTest extends TestCase
      */
     public function testSetId(): void
     {
-        self::assertClassHasAttribute('id', Content::class);
-        $confluencePage = new Content();
+        self::assertClassHasAttribute('id', AbstractContent::class);
+        $confluencePage = new ContentPage();
         $confluencePage->setId(123);
         self::assertSame(123, $confluencePage->getId());
     }

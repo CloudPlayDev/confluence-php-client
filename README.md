@@ -20,7 +20,8 @@ $ php composer.phar require cloudplaydev/confluence-php-client
 declare(strict_types=1);
 
 use CloudPlayDev\ConfluenceClient\ConfluenceClient;
-use CloudPlayDev\ConfluenceClient\Entity\Content as ContentEntity;
+use CloudPlayDev\ConfluenceClient\Api\Content;
+use CloudPlayDev\ConfluenceClient\Entity\ContentPage;
 
 //Create the Confluence Client
 $client = new ConfluenceClient('https://url-to-conluence');
@@ -28,8 +29,8 @@ $client = new ConfluenceClient('https://url-to-conluence');
 //authenticate with a private access token
 $client->authenticate('NjU2OTA4NDI2MTY5OkBznOUO8YjaUF7KoOruZRXhILJ9');
 
-//Create a confluence content
-$page = new ContentEntity();
+//Create a confluence content page
+$page = new ContentPage();
 
 //Configure your page
 $page->setSpace('testSpaceKey')
@@ -49,14 +50,10 @@ $createdPage = $client->content()->findOneBy([
 $createdPage->setContent('some new content');
 $client->content()->update($createdPage);
 
+//get child content
+$childContent = $client->content()->children($createdPage, Content::CONTENT_TYPE_PAGE);
+
 
 
 ```
-
-
-### Get your development instance
-
-Atlassian changed the way to work on Confluence/Jira, now in order to create your plugin, you have to get a [Developer Account](http://go.atlassian.com/cloud-dev) and create your own instance. All the steps to create your environment are defined on the [documentation page](https://developer.atlassian.com/static/connect/docs/latest/guides/development-setup.html).
-
-Once you have access to your own Atlassian Cloud instance and you put it in developer mode, we can continue and let the instance contact us.
 
