@@ -8,13 +8,14 @@ jobs:
     strategy:
       matrix:
         php-versions: ['7.4', '8.0']
+        composer-args: ['--prefer-stable', '--prefer-lowest']
 
     steps:
       - uses: actions/checkout@v2
       - uses: php-actions/composer@v5
         with:
           php_version: ${{ matrix.php-versions }}
-          args: --prefer-stable
+          args: ${{ matrix.composer-args }}
       - name: PHPUnit tests
         uses: php-actions/phpunit@v3
         with:
