@@ -123,7 +123,7 @@ abstract class AbstractApi
      */
     private static function prepareUri(string $uri, array $query = []): string
     {
-        $query = array_filter($query, static function ($value): bool {
+        $query = array_filter($query, static function($value): bool {
             return null !== $value;
         });
 

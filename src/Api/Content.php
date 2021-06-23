@@ -141,7 +141,7 @@ class Content extends AbstractApi
         ];
 
         /* attach content to content */
-        if(null !== $content->getContainerId()) {
+        if (null !== $content->getContainerId()) {
             $data['container'] = [
                 'id' => $content->getContainerId(),
                 'type' => $content->getContainerType(),
@@ -209,7 +209,7 @@ class Content extends AbstractApi
     public function findOneBy(array $searchParameter): ?AbstractContent
     {
         $allowedSearchParameter = ['title', 'spaceKey', 'type', 'id'];
-        $queryParameter = array_filter($searchParameter, static function (string $searchKey) use ($allowedSearchParameter) {
+        $queryParameter = array_filter($searchParameter, static function(string $searchKey) use ($allowedSearchParameter) {
             return in_array($searchKey, $allowedSearchParameter, true);
         }, ARRAY_FILTER_USE_KEY);
 
@@ -306,7 +306,7 @@ class Content extends AbstractApi
         if (isset($decodedData['version']['number'])) {
             $content->setVersion((int)$decodedData['version']['number']);
         }
-        if(isset($decodedData['body']['storage']['value']) ) {
+        if (isset($decodedData['body']['storage']['value'])) {
             assert(is_array($decodedData['body']['storage']));
             $content->setContent((string)$decodedData['body']['storage']['value']);
         }

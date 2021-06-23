@@ -1,4 +1,6 @@
 # Confluence PHP Client
+[![CI](https://github.com/CloudPlayDev/confluence-php-client/actions/workflows/ci.yml/badge.svg)](https://github.com/CloudPlayDev/confluence-php-client/actions/workflows/ci.yml) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/CloudPlayDev/confluence-php-client/badges/quality-score.png?b=main)](https://scrutinizer-ci.com/g/CloudPlayDev/confluence-php-client/?branch=main)
+
 A Confluence RESTful API client in PHP
 
 An Object Oriented wrapper for Confluence

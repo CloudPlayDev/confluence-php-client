@@ -11,7 +11,7 @@ namespace CloudPlayDev\ConfluenceClient\Entity;
 
 use CloudPlayDev\ConfluenceClient\Api\Content;
 
-class ContentPage extends AbstractContent{
+class ContentPage extends AbstractContent {
 
     protected string $type = Content::CONTENT_TYPE_PAGE;
 }
