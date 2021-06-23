@@ -5,14 +5,18 @@ on: [push]
 jobs:
   build-test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-versions: ['7.4', '8.0']
 
     steps:
       - uses: actions/checkout@v2
       - uses: php-actions/composer@v5
         with:
-          php_version: 7.4
+          php_version: ${{ matrix.php-versions }}
+          args: --prefer-stable
       - name: PHPUnit tests
         uses: php-actions/phpunit@v3
         with:
           configuration: phpunit.xml
-          php_version: 7.4
+          php_version: ${{ matrix.php-versions }}
