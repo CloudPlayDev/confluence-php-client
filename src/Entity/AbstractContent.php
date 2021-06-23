@@ -90,10 +90,10 @@ abstract class AbstractContent
     }
 
     /**
-     * @param string $space
+     * @param string|null $space
      * @return self
      */
-    public function setSpace(string $space): self
+    public function setSpace(?string $space): self
     {
         $this->space = $space;
         return $this;
@@ -181,9 +181,7 @@ abstract class AbstractContent
         $contentComment->setContainerId($this->getId());
         $contentComment->setContainerType($this->getType());
         $contentComment->setContent($comment);
-        if ($this->getSpace()) {
-            $contentComment->setSpace($this->getSpace());
-        }
+        $contentComment->setSpace($this->getSpace());
         return $contentComment;
     }
 
@@ -195,13 +193,11 @@ abstract class AbstractContent
     public function createSubpage(string $title, string $body): ContentPage
     {
         $contentPage = new ContentPage();
-        if ($this->id) {
-            $contentPage->addAncestor($this->id);
-        }
         $contentPage->setContent($body);
         $contentPage->setTitle($title);
-        if ($this->getSpace()) {
-            $contentPage->setSpace($this->getSpace());
+        $contentPage->setSpace($this->getSpace());
+        if ($this->id) {
+            $contentPage->addAncestor($this->id);
         }
         return $contentPage;
     }
