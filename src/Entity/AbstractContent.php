@@ -181,7 +181,9 @@ abstract class AbstractContent
         $contentComment->setContainerId($this->getId());
         $contentComment->setContainerType($this->getType());
         $contentComment->setContent($comment);
-        $contentComment->setSpace($this->getSpace());
+        if ($this->getSpace()) {
+            $contentComment->setSpace($this->getSpace());
+        }
         return $contentComment;
     }
 
@@ -193,10 +195,14 @@ abstract class AbstractContent
     public function createSubpage(string $title, string $body): ContentPage
     {
         $contentPage = new ContentPage();
-        $contentPage->addAncestor($this->id);
+        if ($this->id) {
+            $contentPage->addAncestor($this->id);
+        }
         $contentPage->setContent($body);
         $contentPage->setTitle($title);
-        $contentPage->setSpace($this->getSpace());
+        if ($this->getSpace()) {
+            $contentPage->setSpace($this->getSpace());
+        }
         return $contentPage;
     }
 
