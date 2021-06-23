@@ -9,12 +9,19 @@ jobs:
       matrix:
         php-versions: ['7.4', '8.0']
         composer-args: ['--prefer-stable', '--prefer-lowest']
+        composer-command: ['install', 'update']
+        exclude:
+          - composer-args: '--prefer-stable'
+            composer-command: 'install'
+          - composer-args: '--prefer-lowest'
+            composer-command: 'install'
 
     steps:
       - uses: actions/checkout@v2
       - uses: php-actions/composer@v5
         with:
           php_version: ${{ matrix.php-versions }}
+          command: ${{ matrix.composer-command }}
           args: ${{ matrix.composer-args }}
       - name: PHPUnit tests
         uses: php-actions/phpunit@v3
