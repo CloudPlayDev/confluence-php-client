@@ -140,6 +140,14 @@ class Content extends AbstractApi
             ],
         ];
 
+        if (count($content->getAncestors()) > 0) {
+            $ancestorsData = array_map(static function(int $id) {
+                return ['id' => $id];
+            }, $content->getAncestors());
+
+            $data['ancestors'] = $ancestorsData;
+        }
+
         /* attach content to content */
         if (null !== $content->getContainerId()) {
             $data['container'] = [

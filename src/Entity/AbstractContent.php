@@ -14,6 +14,11 @@ abstract class AbstractContent
 
     private ?string $content = null;
 
+    /**
+     * @var int[]
+     */
+    private array $ancestors = [];
+
     private int $version = 1;
     /**
      * @var array<string, string> $children
@@ -176,6 +181,7 @@ abstract class AbstractContent
         $contentComment->setContainerId($this->getId());
         $contentComment->setContainerType($this->getType());
         $contentComment->setContent($comment);
+        $contentComment->setSpace($this->getSpace());
         return $contentComment;
     }
 
@@ -187,10 +193,10 @@ abstract class AbstractContent
     public function createSubpage(string $title, string $body): ContentPage
     {
         $contentPage = new ContentPage();
-        $contentPage->setContainerId($this->getId());
-        $contentPage->setContainerType($this->getType());
+        $contentPage->addAncestor($this->id);
         $contentPage->setContent($body);
         $contentPage->setTitle($title);
+        $contentPage->setSpace($this->getSpace());
         return $contentPage;
     }
 
@@ -224,6 +230,34 @@ abstract class AbstractContent
     public function setContainerType(string $containerType): void
     {
         $this->containerType = $containerType;
+    }
+
+    /**
+     * @return int[]
+     */
+    public function getAncestors(): array
+    {
+        return $this->ancestors;
+    }
+
+    /**
+     * @param int[] $ancestors
+     * @return self
+     */
+    public function setAncestors(array $ancestors): self
+    {
+        $this->ancestors = $ancestors;
+        return $this;
+    }
+
+    /**
+     * @param int $id
+     * @return self
+     */
+    public function addAncestor(int $id): self
+    {
+        $this->ancestors[] = $id;
+        return $this;
     }
 
 }
