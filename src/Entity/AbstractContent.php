@@ -5,8 +5,10 @@ namespace CloudPlayDev\ConfluenceClient\Entity;
 
 
 use CloudPlayDev\ConfluenceClient\Api\Content;
+use CloudPlayDev\ConfluenceClient\Exception\HydrationException;
+use Webmozart\Assert\Assert;
 
-abstract class AbstractContent
+abstract class AbstractContent implements Hydratable
 {
     private ?int $id = null;
     private ?string $title = null;
@@ -261,5 +263,47 @@ abstract class AbstractContent
         $this->ancestors[] = $id;
         return $this;
     }
+
+    /**
+     * @param mixed[] $data
+     * @return AbstractContent|ContentPage|ContentComment
+     * @throws HydrationException
+     */
+    public static function load(array $data): self
+    {
+        Assert::true(isset($data['id'],
+            $data['type'],
+            $data['title'],
+            $data['_links']['self']));
+        Assert::string($data['type']);
+
+        switch ($data['type']) {
+            case Content::CONTENT_TYPE_PAGE:
+                $content = new ContentPage();
+                break;
+            case Content::CONTENT_TYPE_COMMENT:
+                $content = new ContentComment();
+                break;
+            default:
+                throw new HydrationException('Invalid content type: ' . $data['type']);
+        }
+
+        $content->setId((int)$data['id']);
+        $content->setTitle((string)$data['title']);
+        $content->setUrl((string)$data['_links']['self']);
+        if (isset($data['space']['key'])) {
+            $content->setSpace((string)$data['space']['key']);
+        }
+        if (isset($data['version']['number'])) {
+            $content->setVersion((int)$data['version']['number']);
+        }
+        if (isset($data['body']['storage']['value'])) {
+            Assert::isArray($data['body']['storage']);
+            $content->setContent((string)$data['body']['storage']['value']);
+        }
+
+        return $content;
+    }
+
 
 }

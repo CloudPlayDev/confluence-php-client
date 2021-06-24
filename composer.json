@@ -1,11 +1,12 @@
 {
   "name": "cloudplaydev/confluence-php-client",
-  "description": "Confluence API PHP Client",
-  "version": "0.2.1",
+  "description": "Provides methods for Confluence REST APIs",
+  "version": "0.3.0",
   "license": "MIT",
   "keywords": [
     "Atlassian",
     "Confluence",
+    "API",
     "Authentication",
     "PHP",
     "Client"
@@ -33,7 +34,6 @@
   },
   "require": {
     "php": "^7.4 || ^8.0",
-    "ext-curl": "*",
     "ext-json": "*",
     "psr/http-message": "^1.0",
     "psr/http-client": "^1.0",
@@ -42,14 +42,16 @@
     "php-http/httplug": "^2.0",
     "php-http/discovery": "^1.0",
     "php-http/promise": "^1.0",
-    "php-http/client-common": "^2.0"
+    "php-http/client-common": "^2.0",
+    "webmozart/assert": "^1.2"
   },
   "require-dev": {
-    "roave/security-advisories": "dev-latest",
     "phpunit/phpunit": "^9.5.5",
     "phpstan/phpstan": "^0.12.90",
     "vimeo/psalm": "^4.8",
     "guzzlehttp/guzzle": "^7.2",
-    "http-interop/http-factory-guzzle": "^1.0"
+    "http-interop/http-factory-guzzle": "^1.0",
+    "phpstan/phpstan-webmozart-assert": "^0.12.12",
+    "phpstan/extension-installer": "^1.1"
   }
 }

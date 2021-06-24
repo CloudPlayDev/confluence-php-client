@@ -43,10 +43,11 @@ $page->setSpace('testSpaceKey')
 $client->content()->create($page);
 
 //Get the page we created
-$createdPage = $client->content()->findOneBy([
+$searchResults = $client->content()->find([
     'spaceKey' => 'testSpaceKey',
     'title' => 'Test'
 ]);
+$createdPage = $searchResults->getResultAt(0);
 
 //Update page content
 $createdPage->setContent('some new content');
@@ -64,7 +65,7 @@ $createdComment->setContent('new comment');
 $client->content()->update($createdComment);
 
 //delete a content 
-$client->content()->remove($createdComment);
+$client->content()->delete($createdComment);
 
 
 ```

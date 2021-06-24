@@ -4,23 +4,18 @@ declare(strict_types=1);
 namespace CloudPlayDev\ConfluenceClient\Api;
 
 use CloudPlayDev\ConfluenceClient\Entity\AbstractContent;
-use CloudPlayDev\ConfluenceClient\Entity\ContentComment;
-use CloudPlayDev\ConfluenceClient\Entity\ContentPage;
-use CloudPlayDev\ConfluenceClient\Exception\Exception;
-use CloudPlayDev\ConfluenceClient\Exception\RequestException;
+use CloudPlayDev\ConfluenceClient\Entity\ContentSearchResult;
+use CloudPlayDev\ConfluenceClient\Entity\ContentBody;
+use CloudPlayDev\ConfluenceClient\Exception\ConfluencePhpClientException;
 use Http\Client\Exception as HttpClientException;
 use JsonException;
 use Psr\Http\Message\ResponseInterface;
-use function assert;
+use Webmozart\Assert\Assert;
 use function count;
 use function in_array;
-use function is_array;
-use function is_int;
-use function is_string;
 
 /**
- * Class Content
- * @package CloudPlayDev\ConfluenceClient\Api
+ * @see https://docs.atlassian.com/atlassian-confluence/REST/6.6.0/#content
  */
 class Content extends AbstractApi
 {
@@ -50,53 +45,53 @@ class Content extends AbstractApi
     private const DEFAULT_EXPAND = 'space,version,body.storage,container';
 
     /**
-     * @param string|int|null ...$parameter
-     * @return string
-     */
-    private static function getContentUri(...$parameter): string
-    {
-        $uri = 'content';
-        $parameterString = implode('/', array_filter($parameter));
-
-        if (!empty($parameterString)) {
-            $uri .= '/' . $parameterString;
-        }
-
-        return $uri . '?';
-    }
-
-    /**
+     * @see https://docs.atlassian.com/atlassian-confluence/REST/6.6.0/#content-getContent
      * @param int $contentId
-     * @return AbstractContent
-     * @throws Exception
-     * @throws JsonException
-     * @throws RequestException
-     * @throws HttpClientException
+     * @return AbstractContent|null
+     * @throws ConfluencePhpClientException
      */
-    public function findOneById(int $contentId): AbstractContent
+    public function get(int $contentId): ?AbstractContent
     {
-        $response = $this->get(self::getContentUri($contentId), ['expand' => self::DEFAULT_EXPAND]);
+        $response = $this->httpGet(
+            self::getRestfulUri('content', $contentId),
+            ['expand' => self::DEFAULT_EXPAND]
+        );
+        return $this->hydrateResponse($response, AbstractContent::class);
+    }
 
-        if ($response->getStatusCode() !== 200) {
-            throw new RequestException($response);
-        }
 
-        return $this->deserialize($response);
+    /**
+     * @see https://docs.atlassian.com/atlassian-confluence/REST/6.6.0/#content-getContent
+     * @param array{title?: string, spaceKey?: string, type?: string, id?: int|string} $searchParameter
+     * @return ContentSearchResult
+     * @throws ConfluencePhpClientException
+     */
+    public function find(array $searchParameter): ContentSearchResult
+    {
+        $allowedSearchParameter = ['title', 'spaceKey', 'type', 'id'];
+        $queryParameter = array_filter($searchParameter, static function(string $searchKey) use ($allowedSearchParameter) {
+            return in_array($searchKey, $allowedSearchParameter, true);
+        }, ARRAY_FILTER_USE_KEY);
+
+        $queryParameter['expand'] = self::DEFAULT_EXPAND;
+
+        $searchResponse = $this->httpGet('content', $queryParameter);
+
+        return $this->hydrateResponse($searchResponse, ContentSearchResult::class);
     }
 
     /**
+     * @see https://docs.atlassian.com/atlassian-confluence/REST/6.6.0/#content-update
      * @param AbstractContent $content
-     * @return ResponseInterface
-     * @throws Exception
+     * @return AbstractContent
      * @throws JsonException
      * @throws HttpClientException
      */
-    public function update(AbstractContent $content): ResponseInterface
+    public function update(AbstractContent $content): AbstractContent
     {
         $contentId = $content->getId();
-        if (null === $contentId) {
-            throw new Exception('Only saved content can be updated.');
-        }
+        Assert::integer($contentId, 'The content can only be changed when it has already been created. To do this, use the "create" method.');
+
         $data = [
             'id' => $contentId,
             'type' => $content->getType(),
@@ -111,22 +106,24 @@ class Content extends AbstractApi
             'version' => ['number' => $content->getVersion() + 1]
         ];
 
-        return $this->put(self::getContentUri($contentId), $data);
-
+        return $this->hydrateResponse(
+            $this->httpPut(self::getRestfulUri('content', $contentId), $data),
+            AbstractContent::class
+        );
     }
 
+
     /**
+     * @see https://docs.atlassian.com/atlassian-confluence/REST/6.6.0/#content-createContent
      * @param AbstractContent $content
      * @return AbstractContent
-     * @throws Exception
+     * @throws ConfluencePhpClientException
      * @throws HttpClientException
      * @throws JsonException
      */
     public function create(AbstractContent $content): AbstractContent
     {
-        if (null !== $content->getId()) {
-            throw new Exception('Only new pages can be created.');
-        }
+        Assert::null($content->getId(), 'Only pages not already saved can be created.');
 
         $data = [
             'type' => $content->getType(),
@@ -156,169 +153,87 @@ class Content extends AbstractApi
             ];
         }
 
-        $response = $this->post(self::getContentUri(), $data);
-
-        if ($response->getStatusCode() !== 200) {
-            throw new RequestException($response);
-        }
-
-        return $this->deserialize($response);
+        $response = $this->httpPost(self::getRestfulUri('content'), [], $data);
+        return $this->hydrateResponse($response, AbstractContent::class);
 
     }
 
     /**
+     * @see https://docs.atlassian.com/atlassian-confluence/REST/6.6.0/#content-delete
      * @param AbstractContent $content
      * @return ResponseInterface
      */
-    public function remove(AbstractContent $content): ResponseInterface
+    public function delete(AbstractContent $content): ResponseInterface
     {
         $contentId = $content->getId();
-        if (null === $contentId) {
-            throw new Exception('Only saved pages can be removed.');
-        }
-        return $this->delete(self::getContentUri($contentId));
+        Assert::integer($contentId, 'The content must already be saved to be deleted.');
+        return $this->httpDelete(self::getRestfulUri('content', $contentId));
     }
 
     /**
      * @param AbstractContent $content
      * @param string|null $contentType
-     * @return AbstractContent[]
+     * @return ContentSearchResult
      * @throws HttpClientException
      * @throws JsonException
      */
-    public function children(AbstractContent $content, ?string $contentType = null): array
+    public function children(AbstractContent $content, ?string $contentType = null): ContentSearchResult
     {
-        return $this->parseSearchResults(
-            $this->get(
-                self::getContentUri($content->getId(), 'child', $contentType),
-                ['expand' => self::DEFAULT_EXPAND]
-            ),
+        return $this->hydrateResponse(
+            $this->httpGet(self::getRestfulUri('content', $content->getId(), 'child', $contentType), ['expand' => self::DEFAULT_EXPAND]),
+            ContentSearchResult::class
         );
     }
 
     /**
      * @param AbstractContent $content
      * @param string|null $contentType
-     * @return AbstractContent[]
+     * @return ContentSearchResult
      * @throws HttpClientException
      * @throws JsonException
      */
-    public function descendants(AbstractContent $content, ?string $contentType = null): array
+    public function descendants(AbstractContent $content, ?string $contentType = null): ContentSearchResult
     {
-        return $this->parseSearchResults($this->get(self::getContentUri($content->getId(), 'descendant', $contentType)));
+        return $this->hydrateResponse(
+            $this->httpGet(self::getRestfulUri('content', $content->getId(), 'descendant', $contentType)),
+            ContentSearchResult::class
+        );
     }
 
     /**
-     * @param array{title?: string, spaceKey?: string, type?: string, id?: int|string} $searchParameter
-     * @return AbstractContent|null
-     * @throws Exception
-     * @throws JsonException
+     * @see https://docs.atlassian.com/atlassian-confluence/REST/6.6.0/#contentbody/convert/{to}-convert
+     * @param ContentBody $convertBody
+     * @param string $to
+     * @param AbstractContent|null $abstractContent
+     * @return ContentBody
      */
-    public function findOneBy(array $searchParameter): ?AbstractContent
+    public function convert(ContentBody $convertBody, string $to = 'view', ?AbstractContent $abstractContent = null): ContentBody
     {
-        $allowedSearchParameter = ['title', 'spaceKey', 'type', 'id'];
-        $queryParameter = array_filter($searchParameter, static function(string $searchKey) use ($allowedSearchParameter) {
-            return in_array($searchKey, $allowedSearchParameter, true);
-        }, ARRAY_FILTER_USE_KEY);
+        $queryParameter = [];
 
-        $queryParameter['expand'] = self::DEFAULT_EXPAND;
-
-        $searchResponse = $this->get('content?', $queryParameter);
-
-        if ($searchResponse->getStatusCode() !== 200) {
-            throw new RequestException($searchResponse);
+        if ($abstractContent && $abstractContent->getId() !== null) {
+            $queryParameter['pageIdContext'] = $abstractContent->getId();
         }
 
-        $searchResults = $this->parseSearchResults($searchResponse);
-        if (count($searchResults) > 0) {
-            return reset($searchResults);
+        if ($abstractContent && $abstractContent->getSpace() !== null) {
+            $queryParameter['spaceKeyContext'] = $abstractContent->getSpace();
         }
 
-        return null;
-    }
+        Assert::true(ContentBody::isSupported($to), 'This conversion target is not supported.');
 
-    /**
-     * @param ResponseInterface $response
-     * @return AbstractContent[]
-     * @throws JsonException
-     */
-    private function parseSearchResults(ResponseInterface $response): array
-    {
-        $decodedSearchResponse = json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
-        assert(is_array($decodedSearchResponse));
-        assert(isset($decodedSearchResponse['results'], $decodedSearchResponse['size']));
-        assert(is_array($decodedSearchResponse['results']));
-        assert(is_int($decodedSearchResponse['size']));
+        $data = [
+            'representation' => $convertBody->getRepresentation(),
+            'value' => $convertBody->getValue()
+        ];
 
-        $results = [];
-        if ($decodedSearchResponse['size'] >= 1 && count($decodedSearchResponse['results']) >= 1) {
+        return $this->hydrateResponse(
+            $this->httpPost(
+                self::getRestfulUri('contentbody', 'convert', $to),
+                $queryParameter,
+                $data
+            ),
+            ContentBody::class
+        );
 
-            foreach ($decodedSearchResponse['results'] as $resultEntity) {
-                assert(is_array($resultEntity));
-                $results[] = $this->deserializeContent($resultEntity);
-            }
-        }
-
-        return $results;
-    }
-
-    /**
-     * @param ResponseInterface $response
-     * @return AbstractContent
-     * @throws Exception
-     * @throws JsonException
-     */
-    private function deserialize(ResponseInterface $response): AbstractContent
-    {
-        $responseData = $response->getBody()->getContents();
-
-        $decodedData = json_decode($responseData, true, 512, JSON_THROW_ON_ERROR);
-
-        if (!is_array($decodedData)) {
-            throw new Exception('Return value could not be decoded.');
-        }
-
-        return $this->deserializeContent($decodedData);
-    }
-
-    /**
-     * @param mixed[] $decodedData
-     * @return AbstractContent
-     * @throws Exception
-     */
-    private function deserializeContent(array $decodedData): AbstractContent
-    {
-        assert(isset($decodedData['id'],
-            $decodedData['type'],
-            $decodedData['title'],
-            $decodedData['_links']['self']));
-        assert(is_string($decodedData['type']));
-
-        switch ($decodedData['type']) {
-            case self::CONTENT_TYPE_PAGE:
-                $content = new ContentPage();
-                break;
-            case self::CONTENT_TYPE_COMMENT:
-                $content = new ContentComment();
-                break;
-            default:
-                throw new Exception('Invalid content type: ' . $decodedData['type']);
-        }
-
-        $content->setId((int)$decodedData['id']);
-        $content->setTitle((string)$decodedData['title']);
-        $content->setUrl((string)$decodedData['_links']['self']);
-        if (isset($decodedData['space']['key'])) {
-            $content->setSpace((string)$decodedData['space']['key']);
-        }
-        if (isset($decodedData['version']['number'])) {
-            $content->setVersion((int)$decodedData['version']['number']);
-        }
-        if (isset($decodedData['body']['storage']['value'])) {
-            assert(is_array($decodedData['body']['storage']));
-            $content->setContent((string)$decodedData['body']['storage']['value']);
-        }
-
-        return $content;
     }
 }
