@@ -17,19 +17,58 @@ $ composer require cloudplaydev/confluence-php-client
 
 ## Usage
 
+### Authentication
 ```php
-<?php
-declare(strict_types=1);
-
 use CloudPlayDev\ConfluenceClient\ConfluenceClient;
-use CloudPlayDev\ConfluenceClient\Api\Content;
-use CloudPlayDev\ConfluenceClient\Entity\ContentPage;
 
-//Create the Confluence Client
 $client = new ConfluenceClient('https://url-to-conluence');
 
 //authenticate with a private access token
+//@see https://confluence.atlassian.com/enterprise/using-personal-access-tokens-1026032365.html
 $client->authenticate('NjU2OTA4NDI2MTY5OkBznOUO8YjaUF7KoOruZRXhILJ9');
+```
+
+### Fetch pages, comments and attachments
+
+#### Find pages by title and space key
+```php
+/* @var $client CloudPlayDev\ConfluenceClient\ConfluenceClient */
+
+
+//Get the page we created
+$searchResults = $client->content()->find([
+    'spaceKey' => 'testSpaceKey',
+    'title' => 'Test'
+]);
+
+//first page
+$createdPage = $searchResults->getResultAt(0);
+```
+
+#### Fetch a page or comment by content id
+```php
+/* @var $client CloudPlayDev\ConfluenceClient\ConfluenceClient */
+
+//Get a page or comment
+$resultContent = $client->content()->get(1234567890);
+```
+
+#### Fetch page descendants
+```php
+use CloudPlayDev\ConfluenceClient\Api\Content;
+/* @var $client CloudPlayDev\ConfluenceClient\ConfluenceClient */
+/* @var $page CloudPlayDev\ConfluenceClient\Entity\ContentPage */
+
+//get child content
+$childContent = $client->content()->children($page, Content::CONTENT_TYPE_PAGE); //\CloudPlayDev\ConfluenceClient\Entity\ContentSearchResult
+```
+
+### Manipulating  content
+
+#### Create new page
+```php
+use CloudPlayDev\ConfluenceClient\Entity\ContentPage;
+/* @var $client CloudPlayDev\ConfluenceClient\ConfluenceClient */
 
 //Create a confluence content page
 $page = new ContentPage();
@@ -41,32 +80,59 @@ $page->setSpace('testSpaceKey')
 
 //Create the page in confluence in the test space
 $client->content()->create($page);
+```
 
-//Get the page we created
-$searchResults = $client->content()->find([
-    'spaceKey' => 'testSpaceKey',
-    'title' => 'Test'
-]);
-$createdPage = $searchResults->getResultAt(0);
+#### Create new comment
+```php
+/* @var $client CloudPlayDev\ConfluenceClient\ConfluenceClient */
 
-//Update page content
-$createdPage->setContent('some new content');
-$client->content()->update($createdPage);
+//get a page by id
+$page = $client->content()->get(123456789);
 
-//get child content
-$childContent = $client->content()->children($createdPage, Content::CONTENT_TYPE_PAGE);
+//attach a comment to the page
+$comment = $page->createComment('my comment text');
 
-//create a comment
-$commentContent = $createdPage->createComment('test comment');
-$createdComment = $client->content()->create($commentContent);
+//save the comment
+$client->content()->create($comment);
+```
 
-//update a comment
-$createdComment->setContent('new comment');
-$client->content()->update($createdComment);
+#### Create subpage
+```php
+/* @var $client CloudPlayDev\ConfluenceClient\ConfluenceClient */
 
-//delete a content 
-$client->content()->delete($createdComment);
+//get a page by id
+$page = $client->content()->get(123456789);
 
+//attach a subpage to page
+$subPage = $page->createSubpage('subpage title', 'subpage content');
 
+//save the page
+$client->content()->create($subPage);
+```
+
+#### Update content
+```php
+/* @var $client CloudPlayDev\ConfluenceClient\ConfluenceClient */
+
+//get content by id
+$page = $client->content()->get(123456789);
+
+//change content
+$page->setContent('new content')
+    ->setTitle('new title');
+
+//save the changes
+$client->content()->update($page);
+```
+
+#### Delete content
+```php
+/* @var $client CloudPlayDev\ConfluenceClient\ConfluenceClient */
+
+//get content by id
+$page = $client->content()->get(123456789);
+
+//delete content
+$client->content()->delete($page);
 ```
 
