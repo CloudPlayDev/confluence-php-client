@@ -184,12 +184,15 @@ abstract class AbstractApi
 
     /**
      * Throw the correct exception for this error.
+     * @throws HttpClientException
+     * @throws HttpServerException
+     * @throws ConfluencePhpClientException
      */
     protected function handleErrors(ResponseInterface $response): void
     {
         $statusCode = $response->getStatusCode();
 
-        if (in_array($response->getStatusCode(), [200, 201, 202, 204], true)) {
+        if (in_array($statusCode, [200, 201, 202, 204], true)) {
             return;
         }
 
