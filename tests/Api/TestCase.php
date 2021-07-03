@@ -46,6 +46,8 @@ abstract class TestCase extends BaseTestCase
 
     /**
      * @param string $responseString
+     * @param int $responseCode
+     * @param string $contentType
      * @return mixed|MockObject|ResponseInterface
      */
     protected function createResponse(string $responseString, int $responseCode = 200, string $contentType = 'application/json') {

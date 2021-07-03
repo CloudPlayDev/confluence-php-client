@@ -16,7 +16,7 @@ class ContentTest extends TestCase
 
     private const PAGE_CONTENT = [
         'id' => 1234556,
-        'title' => 'testtitle',
+        'title' => 'Test title',
         '_links' => [
             'self' => 'https://example.com/content/1234556'
         ],
@@ -24,7 +24,7 @@ class ContentTest extends TestCase
     ];
     private const COMMENT_CONTENT = [
         'id' => 1234556,
-        'title' => 'testtitle',
+        'title' => 'Test title',
         '_links' => [
             'self' => 'https://example.com/content/1234556'
         ],
@@ -32,7 +32,7 @@ class ContentTest extends TestCase
     ];
     private const COMMENT_2_CONTENT = [
         'id' => 1234556,
-        'title' => 'testtitle',
+        'title' => 'Test title',
         '_links' => [
             'self' => 'https://example.com/content/1234556'
         ],

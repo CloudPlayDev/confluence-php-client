@@ -40,7 +40,7 @@
     "psr/http-client-implementation": "^1.0",
     "psr/http-factory": "^1.0",
     "php-http/httplug": "^2.0",
-    "php-http/discovery": "^1.0",
+    "php-http/discovery": "^1.6",
     "php-http/promise": "^1.0",
     "php-http/client-common": "^2.0",
     "webmozart/assert": "^1.2"
