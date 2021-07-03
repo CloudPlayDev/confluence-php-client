@@ -42,7 +42,7 @@
     "php-http/httplug": "^2.0",
     "php-http/discovery": "^1.11",
     "php-http/promise": "^1.0",
-    "php-http/client-common": "^2.0",
+    "php-http/client-common": "^2.2",
     "webmozart/assert": "^1.2"
   },
   "require-dev": {
