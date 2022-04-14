@@ -43,7 +43,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php-versions: ['7.4', '8.0']
+        php-versions: ['7.4', '8.1']
         composer-args: ['--prefer-stable', '--prefer-lowest', '']
         composer-command: ['install', 'update']
         exclude:

@@ -33,7 +33,7 @@
     }
   },
   "require": {
-    "php": "^7.4 || ^8.0",
+    "php": "^7.4 || ^8.1",
     "ext-json": "*",
     "psr/http-message": "^1.0",
     "psr/http-client": "^1.0",
