@@ -47,11 +47,16 @@
   },
   "require-dev": {
     "phpunit/phpunit": "^9.5.5",
-    "phpstan/phpstan": "^0.12.90",
+    "phpstan/phpstan": "^1.0.0",
     "vimeo/psalm": "^4.8",
     "guzzlehttp/guzzle": "^7.2",
     "http-interop/http-factory-guzzle": "^1.0",
-    "phpstan/phpstan-webmozart-assert": "^0.12.12",
+    "phpstan/phpstan-webmozart-assert": "^1.0.0",
     "phpstan/extension-installer": "^1.1"
+  },
+  "config": {
+    "allow-plugins": {
+      "phpstan/extension-installer": true
+    }
   }
 }
