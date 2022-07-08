@@ -88,6 +88,7 @@ class ContentSearchResult implements Hydratable
     }
 
     /**
+     * @param AbstractContent $content
      * @return self
      */
     public function addResult(AbstractContent $content): self
