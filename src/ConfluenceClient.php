@@ -5,6 +5,7 @@ namespace CloudPlayDev\ConfluenceClient;
 
 use CloudPlayDev\ConfluenceClient\Api\Content;
 use CloudPlayDev\ConfluenceClient\HttpClient\Builder;
+use CloudPlayDev\ConfluenceClient\HttpClient\Plugin\BasicAuthentication;
 use CloudPlayDev\ConfluenceClient\HttpClient\Plugin\TokenAuthentication;
 use Http\Client\Common\HttpMethodsClientInterface;
 use Http\Client\Common\Plugin\AddHostPlugin;
@@ -32,6 +33,14 @@ class ConfluenceClient
     {
         $this->httpClientBuilder->removePlugin(TokenAuthentication::class);
         $this->httpClientBuilder->addPlugin(new TokenAuthentication($token));
+
+        return $this;
+    }
+
+    public function authenticateBasicAuth(string $username, string $password): ConfluenceClient
+    {
+        $this->httpClientBuilder->removePlugin(BasicAuthentication::class);
+        $this->httpClientBuilder->addPlugin(new BasicAuthentication($username, $password));
 
         return $this;
     }
