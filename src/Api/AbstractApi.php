@@ -168,9 +168,6 @@ abstract class AbstractApi
         if (!str_starts_with($contentType, 'application/json')) {
             throw new HydrationException('The ModelHydrator cannot hydrate response with Content-Type: ' . $contentType);
         }
-        if (!is_subclass_of($class, Hydratable::class)) {
-            throw new HydrationException('This class can not be hydrated: ' . $class);
-        }
 
         $data = json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
         Assert::isArray($data);
