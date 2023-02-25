@@ -32,7 +32,6 @@ class ContentTest extends TestCase
      */
     public function testSetSpace(): void
     {
-        self::assertClassHasAttribute('space', AbstractContent::class);
         $confluencePage = new ContentPage();
         $confluencePage->setSpace('TEST');
         static::assertSame('TEST', $confluencePage->getSpace());
@@ -43,7 +42,6 @@ class ContentTest extends TestCase
      */
     public function testSetId(): void
     {
-        self::assertClassHasAttribute('id', AbstractContent::class);
         $confluencePage = new ContentPage();
         $confluencePage->setId(123);
         self::assertSame(123, $confluencePage->getId());

@@ -266,7 +266,7 @@ class ContentTest extends TestCase
         $api->get(1);
     }
 
-    public function exceptionErrorCodes(): array
+    public static function exceptionErrorCodes(): array
     {
         return [
             400 => [400, HttpClientException::class],
