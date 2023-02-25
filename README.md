@@ -18,6 +18,8 @@ $ composer require cloudplaydev/confluence-php-client
 ## Usage
 
 ### Authentication
+
+#### Using Personal Access Tokens
 ```php
 use CloudPlayDev\ConfluenceClient\ConfluenceClient;
 
@@ -26,6 +28,17 @@ $client = new ConfluenceClient('https://url-to-conluence');
 //authenticate with a private access token
 //@see https://confluence.atlassian.com/enterprise/using-personal-access-tokens-1026032365.html
 $client->authenticate('NjU2OTA4NDI2MTY5OkBznOUO8YjaUF7KoOruZRXhILJ9');
+```
+#### Using BaseAuth
+```php
+$client = new ConfluenceClient('https://USERNAME:PASSWORD@url-to-conluence');
+```
+or
+```php
+use CloudPlayDev\ConfluenceClient\ConfluenceClient;
+
+$client = new ConfluenceClient('https://url-to-conluence');
+$client->authenticateBasicAuth('USERNAME', 'PASSWORD');
 ```
 
 ### Fetch pages, comments and attachments

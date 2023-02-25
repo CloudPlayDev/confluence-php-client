@@ -5,13 +5,13 @@ namespace CloudPlayDev\ConfluenceClient;
 
 use CloudPlayDev\ConfluenceClient\Api\Content;
 use CloudPlayDev\ConfluenceClient\HttpClient\Builder;
-use CloudPlayDev\ConfluenceClient\HttpClient\Plugin\TokenAuthentication;
 use Http\Client\Common\HttpMethodsClientInterface;
 use Http\Client\Common\Plugin\AddHostPlugin;
 use Http\Client\Common\Plugin\AddPathPlugin;
 use Http\Client\Common\Plugin\AuthenticationPlugin;
 use Http\Client\Common\Plugin\HeaderDefaultsPlugin;
 use Http\Message\Authentication\BasicAuth;
+use Http\Message\Authentication\Bearer;
 
 class ConfluenceClient
 {
@@ -21,7 +21,7 @@ class ConfluenceClient
      * @see http://fabien.potencier.org/pragmatism-over-theory-protected-vs-private.html
      */
     protected const USER_AGENT = 'cloudplaydev-confluence-php-client/0.1.0';
-    
+
     /**
      * Use protected visibility to facilitate extension
      * @see http://fabien.potencier.org/pragmatism-over-theory-protected-vs-private.html
@@ -40,8 +40,16 @@ class ConfluenceClient
 
     public function authenticate(string $token): ConfluenceClient
     {
-        $this->httpClientBuilder->removePlugin(TokenAuthentication::class);
-        $this->httpClientBuilder->addPlugin(new TokenAuthentication($token));
+        $this->httpClientBuilder->removePlugin(AuthenticationPlugin::class);
+        $this->httpClientBuilder->addPlugin(new AuthenticationPlugin(new Bearer($token)));
+
+        return $this;
+    }
+
+    public function authenticateBasicAuth(string $username, string $password): ConfluenceClient
+    {
+        $this->httpClientBuilder->removePlugin(AuthenticationPlugin::class);
+        $this->httpClientBuilder->addPlugin(new AuthenticationPlugin(new BasicAuth($username, $password)));
 
         return $this;
     }
@@ -76,16 +84,15 @@ class ConfluenceClient
         $this->httpClientBuilder->addPlugin(new AddHostPlugin($uri));
 
         // Prepend path if any
-        if( $uri->getPath() ) {
+        if ($uri->getPath()) {
             $this->httpClientBuilder->removePlugin(AddPathPlugin::class);
             $this->httpClientBuilder->addPlugin(new AddPathPlugin($uri));
         }
 
         // Report userInfo as Basic authentication
-        if( $uri->getUserInfo() ) {
-            list( $user , $token ) = explode( ':' , $uri->getUserInfo() , 2 );
-            $this->httpClientBuilder->removePlugin(AuthenticationPlugin::class);
-            $this->httpClientBuilder->addPlugin(new AuthenticationPlugin( new BasicAuth( $user , $token ) ) );
+        $userInfo = $uri->getUserInfo();
+        if (!empty($userInfo) && str_contains($userInfo, ':')) {
+            $this->httpClientBuilder->addPlugin(new AuthenticationPlugin(new BasicAuth(...explode(':', $userInfo, 2))));
         }
     }
 }
