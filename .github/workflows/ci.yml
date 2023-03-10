@@ -50,6 +50,9 @@ jobs:
           - "lowest"
           - "highest"
           - "locked"
+        exclude:
+          - php-version: '7.4'
+            dependencies: 'highest'
 
     steps:
       - name: "Checkout"
