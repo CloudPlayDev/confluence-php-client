@@ -33,6 +33,11 @@ class ContentBody implements Hydratable
      * confluence representation
      */
     public const REPRESENTATION_STYLED_VIEW = 'styled_view';
+    
+    /**
+     * confluence representation (wiki markup)
+     */
+    public const REPRESENTATION_WIKI = 'wiki';
 
     /**
      * @example <ac:link><ri:user ri:userkey="a-valid-account-id" /></ac:link>
@@ -64,6 +69,7 @@ class ContentBody implements Hydratable
             self::REPRESENTATION_VIEW,
             self::REPRESENTATION_EXPORT_VIEW,
             self::REPRESENTATION_STYLED_VIEW,
+            self::REPRESENTATION_WIKI,
         ], true));
     }
 
