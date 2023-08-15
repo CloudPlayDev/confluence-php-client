@@ -219,14 +219,14 @@ abstract class AbstractApi
 
     /**
      * @param string|int|null ...$parameter
-     * @return string
+     * @return string example `content/34636069`
      */
     protected static function getRestfulUri(...$parameter): string
     {
         $parameterString = implode('/', array_filter($parameter));
 
         if (!empty($parameterString)) {
-            return '/' . $parameterString;
+            return $parameterString;
         }
 
         return '';
