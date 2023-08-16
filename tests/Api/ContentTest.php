@@ -60,7 +60,7 @@ class ContentTest extends TestCase
 
         $api->expects(self::once())
             ->method('httpGet')
-            ->with('/content/123456')
+            ->with('content/123456')
             ->willReturn($this->createResponse(json_encode(self::PAGE_CONTENT, JSON_THROW_ON_ERROR)));
 
         $page = $api->get(123456);
@@ -110,7 +110,7 @@ class ContentTest extends TestCase
 
         $api->expects(self::once())
             ->method('httpGet')
-            ->with('/content/678/child/comment', $queryParameter)
+            ->with('content/678/child/comment', $queryParameter)
             ->willReturn($this->createResponse(json_encode(self::COMMENT_CONTENT_RESULTS, JSON_THROW_ON_ERROR)));
 
         $page = new ContentPage();
@@ -134,7 +134,7 @@ class ContentTest extends TestCase
 
         $api->expects(self::once())
             ->method('httpGet')
-            ->with('/content/678/descendant/comment', $queryParameter)
+            ->with('content/678/descendant/comment', $queryParameter)
             ->willReturn($this->createResponse(json_encode(self::COMMENT_CONTENT_RESULTS, JSON_THROW_ON_ERROR)));
 
         $page = new ContentPage();
@@ -173,7 +173,7 @@ class ContentTest extends TestCase
 
         $api->expects(self::once())
             ->method('httpPut')
-            ->with('/content/12', $data)
+            ->with('content/12', $data)
             ->willReturn($this->createResponse(json_encode(self::PAGE_CONTENT, JSON_THROW_ON_ERROR)));
 
         $content = new ContentPage();
@@ -208,7 +208,7 @@ class ContentTest extends TestCase
 
         $api->expects(self::once())
             ->method('httpPost')
-            ->with('/content', [], $data)
+            ->with('content', [], $data)
             ->willReturn($this->createResponse(json_encode(self::PAGE_CONTENT, JSON_THROW_ON_ERROR)));
 
         $content = new ContentPage();
@@ -242,7 +242,7 @@ class ContentTest extends TestCase
 
         $api->expects(self::once())
             ->method('httpDelete')
-            ->with('/content/121')
+            ->with('content/121')
             ->willReturn($this->createResponse(''));
 
         $content = new ContentPage();
