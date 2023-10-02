@@ -26,7 +26,7 @@ abstract class AbstractApi
     /**
      * default rest API prefix for confluence
      */
-    private const URI_PREFIX = '/rest/api';
+    private const URI_PREFIX = '/rest/api/';
 
     private ConfluenceClient $client;
 

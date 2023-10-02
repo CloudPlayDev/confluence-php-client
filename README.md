@@ -149,3 +149,16 @@ $page = $client->content()->get(123456789);
 $client->content()->delete($page);
 ```
 
+
+# FAQ
+## How to authenticate with Confuence cloud?
+You have to use basic auth with your username and password. You can also use a personal access token instead of your password. See [Using personal access tokens](https://confluence.atlassian.com/enterprise/using-personal-access-tokens-1026032365.html) for more information.
+
+Create a new API token here: https://id.atlassian.com/manage-profile/security/api-tokens
+
+```php
+use CloudPlayDev\ConfluenceClient\ConfluenceClient;
+
+$client = new ConfluenceClient('https://xxxxxxxx.atlassian.net/wiki/');
+$client->authenticateBasicAuth('USERNAME', 'TOKEN');
+```
