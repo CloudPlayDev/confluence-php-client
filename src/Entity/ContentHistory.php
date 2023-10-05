@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace CloudPlayDev\ConfluenceClient\Entity;
 
+use CloudPlayDev\ConfluenceClient\Exception\HydrationException;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Webmozart\Assert\Assert;
@@ -19,6 +20,9 @@ class ContentHistory implements Hydratable
 
     private int $lastVersionNumber;
 
+    /**
+     * @throws HydrationException
+     */
     public static function load(array $data): ContentHistory
     {
         $contentHistory = new self;
@@ -27,7 +31,6 @@ class ContentHistory implements Hydratable
         Assert::keyExists($data, 'lastUpdated');
         Assert::isArray($data['createdBy']);
         Assert::isArray($data['lastUpdated']);
-        Assert::boolean($data['latest']);
 
         Assert::keyExists($data['lastUpdated'], 'by');
         Assert::isArray($data['lastUpdated']['by']);
@@ -37,15 +40,28 @@ class ContentHistory implements Hydratable
             $contentHistory->setLatest($data['latest']);
         }
 
-        $contentHistory->setCreatedDate(DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s.vZ', $data['createdDate']));
+        $contentHistory->setCreatedDate(self::getDateTimeFromString($data['createdDate']));
         $contentHistory->setCreatedBy(User::load($data['createdBy']));
         $contentHistory->setUpdatedBy(User::load($data['lastUpdated']['by']));
 
-        $contentHistory->setUpdatedDate(DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s.vZ', $data['lastUpdated']['when']));
+        $contentHistory->setUpdatedDate(self::getDateTimeFromString($data['lastUpdated']['when']));
 
         $contentHistory->setLastVersionNumber($data['lastUpdated']['number']);
 
         return $contentHistory;
+    }
+
+    /**
+     * @throws HydrationException
+     */
+    private static function getDateTimeFromString(string $dateString): DateTimeInterface
+    {
+        $dateTimeImmutable = DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s.vZ', $dateString);
+        if($dateTimeImmutable === false) {
+            throw new HydrationException('Invalid date string: ' . $dateString);
+        }
+
+        return $dateTimeImmutable;
     }
 
     private function setLatest(bool $latest): ContentHistory

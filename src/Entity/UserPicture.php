@@ -13,12 +13,12 @@ class UserPicture implements Hydratable
     private int $height;
     private bool $isDefault;
 
-    public static function load(array $data): Hydratable
+    public static function load(array $data): UserPicture
     {
         $userPicture = new self;
         Assert::string($data['path']);
-        Assert::numeric($data['width']);
-        Assert::numeric($data['height']);
+        Assert::integer($data['width']);
+        Assert::integer($data['height']);
         Assert::boolean($data['isDefault']);
 
         $userPicture->setPath($data['path']);
@@ -30,24 +30,28 @@ class UserPicture implements Hydratable
         return $userPicture;
     }
 
-    private function setPath(string $path)
+    private function setPath(string $path): UserPicture
     {
         $this->path = $path;
+        return $this;
     }
 
-    private function setWidth(int $width)
+    private function setWidth(int $width): UserPicture
     {
         $this->width = $width;
+        return $this;
     }
 
-    private function setHeight(int $height)
+    private function setHeight(int $height): UserPicture
     {
         $this->height = $height;
+        return $this;
     }
 
-    private function setIsDefault(bool $isDefault)
+    private function setIsDefault(bool $isDefault): UserPicture
     {
         $this->isDefault = $isDefault;
+        return $this;
     }
 
     public function getPath(): string
