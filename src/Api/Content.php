@@ -4,8 +4,10 @@ declare(strict_types=1);
 namespace CloudPlayDev\ConfluenceClient\Api;
 
 use CloudPlayDev\ConfluenceClient\Entity\AbstractContent;
+use CloudPlayDev\ConfluenceClient\Entity\ContentHistory;
 use CloudPlayDev\ConfluenceClient\Entity\ContentSearchResult;
 use CloudPlayDev\ConfluenceClient\Entity\ContentBody;
+use CloudPlayDev\ConfluenceClient\Entity\Hydratable;
 use CloudPlayDev\ConfluenceClient\Exception\ConfluencePhpClientException;
 use Http\Client\Exception as HttpClientException;
 use JsonException;
@@ -43,19 +45,28 @@ class Content extends AbstractApi
      * default value for expand query parameter
      */
     private const DEFAULT_EXPAND = 'space,version,body.storage,container';
+    private const DEFAULT_HISTORY_EXPAND = 'content,content.space,content.version,content.body.storage,content.container';
 
     /**
      * @see https://docs.atlassian.com/atlassian-confluence/REST/6.6.0/#content-getContent
-     * @param int $contentId
-     * @return AbstractContent|null
      * @throws ConfluencePhpClientException
+     * @throws HttpClientException
+     * @throws JsonException
      */
-    public function get(int $contentId): ?AbstractContent
+    public function get(int $contentId, ?int $version = null): ?AbstractContent
     {
-        $response = $this->httpGet(
-            self::getRestfulUri('content', $contentId),
-            ['expand' => self::DEFAULT_EXPAND]
-        );
+        $fetchUri = ['content', $contentId];
+        $parameter = ['expand' => self::DEFAULT_EXPAND];
+
+        if ($version !== null) {
+            $fetchUri[] = 'version';
+            $fetchUri[] = $version;
+
+            $parameter = ['expand' => self::DEFAULT_HISTORY_EXPAND];
+        }
+
+        $response = $this->httpGet(self::getRestfulUri(...$fetchUri), $parameter);
+
         return $this->hydrateResponse($response, AbstractContent::class);
     }
 
@@ -69,7 +80,7 @@ class Content extends AbstractApi
     public function find(array $searchParameter): ContentSearchResult
     {
         $allowedSearchParameter = ['title', 'spaceKey', 'type', 'id'];
-        $queryParameter = array_filter($searchParameter, static function(string $searchKey) use ($allowedSearchParameter) {
+        $queryParameter = array_filter($searchParameter, static function (string $searchKey) use ($allowedSearchParameter) {
             return in_array($searchKey, $allowedSearchParameter, true);
         }, ARRAY_FILTER_USE_KEY);
 
@@ -138,7 +149,7 @@ class Content extends AbstractApi
         ];
 
         if (count($content->getAncestors()) > 0) {
-            $ancestorsData = array_map(static function(int $id) {
+            $ancestorsData = array_map(static function (int $id) {
                 return ['id' => $id];
             }, $content->getAncestors());
 
@@ -235,5 +246,20 @@ class Content extends AbstractApi
             ContentBody::class
         );
 
+    }
+
+    /**
+     * Returns the history of a particular piece of content, sorted by version number in descending order.
+     *
+     * @param int $contentId
+     * @return Hydratable
+     * @throws HttpClientException
+     */
+    public function history(int $contentId): Hydratable
+    {
+        return $this->hydrateResponse(
+            $this->httpGet(self::getRestfulUri('content', $contentId, 'history')),
+            ContentHistory::class
+        );
     }
 }

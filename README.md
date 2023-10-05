@@ -66,6 +66,14 @@ $createdPage = $searchResults->getResultAt(0);
 $resultContent = $client->content()->get(1234567890);
 ```
 
+#### Fetch old versions of a page or comment by content id
+```php
+/* @var $client CloudPlayDev\ConfluenceClient\ConfluenceClient */
+
+//Get a page or comment in a specific version
+$resultContentInVersion2 = $client->content()->get(1234567890, 2);
+```
+
 #### Fetch page descendants
 ```php
 use CloudPlayDev\ConfluenceClient\Api\Content;
@@ -74,6 +82,17 @@ use CloudPlayDev\ConfluenceClient\Api\Content;
 
 //get child content
 $childContent = $client->content()->children($page, Content::CONTENT_TYPE_PAGE); //\CloudPlayDev\ConfluenceClient\Entity\ContentSearchResult
+```
+
+#### Fetch content history
+```php
+use CloudPlayDev\ConfluenceClient\Api\Content;
+/* @var $client CloudPlayDev\ConfluenceClient\ConfluenceClient */
+/* @var $page CloudPlayDev\ConfluenceClient\Entity\ContentPage */
+
+//get child content
+$pageId = 2323232323;
+$historyData = $client->content()->history($pageId); //\CloudPlayDev\ConfluenceClient\Entity\ContentSearchResult
 ```
 
 ### Manipulating  content

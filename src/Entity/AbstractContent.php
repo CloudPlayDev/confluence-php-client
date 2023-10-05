@@ -32,6 +32,8 @@ abstract class AbstractContent implements Hydratable
     private ?int $containerId = null;
     private string $containerType = Content::CONTENT_TYPE_PAGE;
 
+    private bool $isLatest = true;
+
     /**
      * @return string
      */
@@ -271,6 +273,11 @@ abstract class AbstractContent implements Hydratable
      */
     public static function load(array $data): self
     {
+        /* handle older content versions */
+        if(isset($data['content'], $data['when'])) {
+            return self::load($data['content']);
+        }
+
         Assert::true(isset($data['id'],
             $data['type'],
             $data['title'],
@@ -302,7 +309,23 @@ abstract class AbstractContent implements Hydratable
             $content->setContent((string)$data['body']['storage']['value']);
         }
 
+        if(isset($data['status'])) {
+            Assert::string($data['status']);
+            $content->setLatest($data['status'] === 'current');
+        }
+
         return $content;
+    }
+
+    public function isLatest(): bool
+    {
+        return $this->isLatest;
+    }
+
+    protected function setLatest(bool $isLatest): AbstractContent
+    {
+        $this->isLatest = $isLatest;
+        return $this;
     }
 
 
