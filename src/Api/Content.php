@@ -9,6 +9,8 @@ use CloudPlayDev\ConfluenceClient\Entity\ContentSearchResult;
 use CloudPlayDev\ConfluenceClient\Entity\ContentBody;
 use CloudPlayDev\ConfluenceClient\Entity\Hydratable;
 use CloudPlayDev\ConfluenceClient\Exception\ConfluencePhpClientException;
+use CloudPlayDev\ConfluenceClient\Exception\HttpServerException;
+use CloudPlayDev\ConfluenceClient\Exception\HydrationException;
 use Http\Client\Exception as HttpClientException;
 use JsonException;
 use Psr\Http\Message\ResponseInterface;
@@ -74,10 +76,12 @@ class Content extends AbstractApi
     /**
      * @see https://docs.atlassian.com/atlassian-confluence/REST/6.6.0/#content-getContent
      * @param array{title?: string, spaceKey?: string, type?: string, id?: int|string} $searchParameter
+     * @param int|null $limit Limit the number of results. Usual default is 25
+     * @param int|null $start Start the results at a particular index
      * @return ContentSearchResult
      * @throws ConfluencePhpClientException
      */
-    public function find(array $searchParameter): ContentSearchResult
+    public function find(array $searchParameter, ?int $limit = null, ?int $start = null): ContentSearchResult
     {
         $allowedSearchParameter = ['title', 'spaceKey', 'type', 'id'];
         $queryParameter = array_filter($searchParameter, static function (string $searchKey) use ($allowedSearchParameter) {
@@ -85,6 +89,14 @@ class Content extends AbstractApi
         }, ARRAY_FILTER_USE_KEY);
 
         $queryParameter['expand'] = self::DEFAULT_EXPAND;
+
+        if($limit !== null) {
+            $queryParameter['limit'] = $limit;
+        }
+
+        if($start !== null) {
+            $queryParameter['start'] = $start;
+        }
 
         $searchResponse = $this->httpGet('content', $queryParameter);
 
