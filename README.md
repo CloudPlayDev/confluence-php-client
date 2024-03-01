@@ -58,6 +58,29 @@ $searchResults = $client->content()->find([
 $createdPage = $searchResults->getResultAt(0);
 ```
 
+#### Browse content with pagination
+```php
+/* @var $client CloudPlayDev\ConfluenceClient\ConfluenceClient */
+
+$limit = 100;
+$start = 10;
+
+//Get the search results with pagination
+$searchResults = $client->content()->find([
+    'spaceKey' => 'testSpaceKey',
+    'title' => 'Test'
+], $limit, $start);
+
+//check if there are more results
+while(!$searchResults->isLastPage()) {
+    //get the next pages
+    $nextPages = $client->content()->find([
+        'spaceKey' => 'testSpaceKey',
+        'title' => 'Test'
+    ], $limit, $searchResults->getStart() + $limit);
+}
+``` 
+
 #### Fetch a page or comment by content id
 ```php
 /* @var $client CloudPlayDev\ConfluenceClient\ConfluenceClient */
@@ -88,11 +111,9 @@ $childContent = $client->content()->children($page, Content::CONTENT_TYPE_PAGE);
 ```php
 use CloudPlayDev\ConfluenceClient\Api\Content;
 /* @var $client CloudPlayDev\ConfluenceClient\ConfluenceClient */
-/* @var $page CloudPlayDev\ConfluenceClient\Entity\ContentPage */
 
-//get child content
 $pageId = 2323232323;
-$historyData = $client->content()->history($pageId); //\CloudPlayDev\ConfluenceClient\Entity\ContentSearchResult
+$historyData = $client->content()->history($pageId); // \CloudPlayDev\ConfluenceClient\Entity\ContentHistory
 ```
 
 ### Manipulating  content

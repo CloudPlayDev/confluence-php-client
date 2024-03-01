@@ -20,6 +20,8 @@ class ContentHistory implements Hydratable
 
     private int $lastVersionNumber;
 
+    private ?int $previousVersionNumber = null;
+
     /**
      * @throws HydrationException
      */
@@ -47,6 +49,12 @@ class ContentHistory implements Hydratable
         $contentHistory->setUpdatedDate(self::getDateTimeFromString($data['lastUpdated']['when']));
 
         $contentHistory->setLastVersionNumber($data['lastUpdated']['number']);
+
+        if(isset($data['previousVersion'])) {
+            Assert::isArray($data['previousVersion']);
+            Assert::keyExists($data['previousVersion'], 'number');
+            $contentHistory->setPreviousVersionNumber($data['previousVersion']['number']);
+        }
 
         return $contentHistory;
     }
@@ -127,6 +135,16 @@ class ContentHistory implements Hydratable
     public function setLastVersionNumber(int $lastVersionNumber): void
     {
         $this->lastVersionNumber = $lastVersionNumber;
+    }
+
+    public function getPreviousVersionNumber(): ?int
+    {
+        return $this->previousVersionNumber;
+    }
+
+    public function setPreviousVersionNumber(?int $previousVersionNumber): void
+    {
+        $this->previousVersionNumber = $previousVersionNumber;
     }
 
 

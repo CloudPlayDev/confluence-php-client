@@ -59,7 +59,7 @@ class HttpClientException extends ConfluencePhpClientException
 
     public static function forbidden(ResponseInterface $response): HttpClientException
     {
-        $validationMessage = self::extractValidationMessage($response, 'Error');
+        $validationMessage = self::extractValidationMessage($response, 'message');
 
         $message = sprintf("Forbidden!\n\n%s", $validationMessage);
 

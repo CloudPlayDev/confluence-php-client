@@ -13,10 +13,16 @@ class ContentSearchResult implements Hydratable
 
     private int $size = 0;
 
+    private int $start = 0;
+
+    private int $limit = 0;
+
     /**
      * @var AbstractContent[]
      */
     private array $results = [];
+
+    private bool $lastPage = true;
 
     /**
      * @param mixed[] $data
@@ -34,6 +40,13 @@ class ContentSearchResult implements Hydratable
 
         $searchResult->setSize($data['size']);
 
+        if(isset($data['start']) && isset($data['limit'])) {
+            Assert::integer($data['start']);
+            Assert::integer($data['limit']);
+            $searchResult->setStart($data['start']);
+            $searchResult->setLimit($data['limit']);
+        }
+
         if ($data['size'] >= 1 && count($data['results']) >= 1) {
 
             foreach ($data['results'] as $resultEntity) {
@@ -41,6 +54,11 @@ class ContentSearchResult implements Hydratable
                 $content = AbstractContent::load($resultEntity);
                 $searchResult->addResult($content);
             }
+        }
+
+        /* if there is a next link, then it is not the last page */
+        if(isset($data['_links']['next'])) {
+            $searchResult->setLastPage(false);
         }
 
         return $searchResult;
@@ -96,6 +114,36 @@ class ContentSearchResult implements Hydratable
         $this->results[] = $content;
         return $this;
 
+    }
+
+    public function isLastPage(): bool
+    {
+        return $this->lastPage;
+    }
+
+    public function setLastPage(bool $lastPage): void
+    {
+        $this->lastPage = $lastPage;
+    }
+
+    public function getStart(): int
+    {
+        return $this->start;
+    }
+
+    public function setStart(int $start): void
+    {
+        $this->start = $start;
+    }
+
+    public function getLimit(): int
+    {
+        return $this->limit;
+    }
+
+    public function setLimit(int $limit): void
+    {
+        $this->limit = $limit;
     }
 
 

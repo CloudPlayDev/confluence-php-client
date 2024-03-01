@@ -6,8 +6,11 @@ use CloudPlayDev\ConfluenceClient\Api\Content;
 use CloudPlayDev\ConfluenceClient\ConfluenceClient;
 use CloudPlayDev\ConfluenceClient\HttpClient\Builder;
 use GuzzleHttp\Psr7\Uri;
+use Http\Client\Common\HttpMethodsClientInterface;
+use Http\Discovery\Psr17FactoryDiscovery;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\UriFactoryInterface;
+use Psr\Http\Message\UriInterface;
 
 class ConfluenceClientTest extends TestCase
 {
@@ -17,6 +20,7 @@ class ConfluenceClientTest extends TestCase
         $builder = $this->createMock(Builder::class);
         $builder->expects($this->once())
             ->method('getHttpClient');
+        $builder->method('getUriFactory')->willReturn(Psr17FactoryDiscovery::findUriFactory());
 
         $client = new ConfluenceClient('https://example.com', $builder);
         $client->getHttpClient();
@@ -31,6 +35,8 @@ class ConfluenceClientTest extends TestCase
         $builder->expects($this->atLeast(2))
             ->method('removePlugin');
 
+        $builder->method('getUriFactory')->willReturn(Psr17FactoryDiscovery::findUriFactory());
+
         $client = new ConfluenceClient('https://example.com', $builder);
         $client->authenticateBasicAuth('username', 'password');
     }
@@ -43,6 +49,8 @@ class ConfluenceClientTest extends TestCase
 
         $builder->expects($this->atLeast(2))
             ->method('removePlugin');
+
+        $builder->method('getUriFactory')->willReturn(Psr17FactoryDiscovery::findUriFactory());
 
         $client = new ConfluenceClient('https://example.com', $builder);
         $client->authenticate('token');
@@ -68,6 +76,8 @@ class ConfluenceClientTest extends TestCase
     public function testCanGetContent(): void
     {
         $builder = $this->createMock(Builder::class);
+
+        $builder->method('getUriFactory')->willReturn(Psr17FactoryDiscovery::findUriFactory());
 
         $client = new ConfluenceClient('https://example.com', $builder);
         $content = $client->content();
