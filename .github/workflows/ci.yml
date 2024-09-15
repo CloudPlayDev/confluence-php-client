@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php-versions: ['7.4', '8.1', '8.2']
+        php-versions: ['8.1', '8.2', '8.3']
     steps:
       - uses: actions/checkout@v2
       - uses: php-actions/composer@v5
@@ -45,14 +45,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php-version: ['7.4', '8.1', '8.2']
+        php-version: ['8.1', '8.2', '8.3']
         dependencies:
           - "lowest"
           - "highest"
           - "locked"
-        exclude:
-          - php-version: '7.4'
-            dependencies: 'highest'
 
     steps:
       - name: "Checkout"

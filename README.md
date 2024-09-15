@@ -7,7 +7,7 @@ An Object Oriented wrapper for Confluence
 
 ## Requirements
 
-* PHP >= 7.4.0
+* PHP >= 8.1.0
 
 ## Installation
 
