@@ -131,9 +131,7 @@ abstract class AbstractApi
      */
     private static function prepareUri(string $uri, array $query = []): string
     {
-        $query = array_filter($query, static function($value): bool {
-            return null !== $value;
-        });
+        $query = array_filter($query, static fn($value): bool => null !== $value);
 
         $httpQueryParameter = http_build_query($query);
         if ($httpQueryParameter !== '') {
@@ -193,28 +191,21 @@ abstract class AbstractApi
             return;
         }
 
-        switch ($statusCode) {
-            case 400:
-                throw HttpClientException::badRequest($response);
-            case 401:
-                throw HttpClientException::unauthorized($response);
-            case 402:
-                throw HttpClientException::requestFailed($response);
-            case 403:
-                throw HttpClientException::forbidden($response);
-            case 404:
-                throw HttpClientException::notFound($response);
-            case 409:
-                throw HttpClientException::conflict($response);
-            case 413:
-                throw HttpClientException::payloadTooLarge($response);
-            case 429:
-                throw HttpClientException::tooManyRequests($response);
-            case 500 <= $statusCode:
-                throw HttpServerException::serverError($response);
-            default:
-                throw new ConfluencePhpClientException($response->getBody()->getContents(), $response->getStatusCode());
+        if (500 <= $statusCode) {
+            throw HttpServerException::serverError($response);
         }
+
+        throw match ($statusCode) {
+            400 => HttpClientException::badRequest($response),
+            401 => HttpClientException::unauthorized($response),
+            402 => HttpClientException::requestFailed($response),
+            403 => HttpClientException::forbidden($response),
+            404 => HttpClientException::notFound($response),
+            409 => HttpClientException::conflict($response),
+            413 => HttpClientException::payloadTooLarge($response),
+            429 => HttpClientException::tooManyRequests($response),
+            default => new ConfluencePhpClientException($response->getBody()->getContents(), $response->getStatusCode()),
+        };
     }
 
     /**

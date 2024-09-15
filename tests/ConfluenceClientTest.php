@@ -6,11 +6,9 @@ use CloudPlayDev\ConfluenceClient\Api\Content;
 use CloudPlayDev\ConfluenceClient\ConfluenceClient;
 use CloudPlayDev\ConfluenceClient\HttpClient\Builder;
 use GuzzleHttp\Psr7\Uri;
-use Http\Client\Common\HttpMethodsClientInterface;
 use Http\Discovery\Psr17FactoryDiscovery;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\UriFactoryInterface;
-use Psr\Http\Message\UriInterface;
 
 class ConfluenceClientTest extends TestCase
 {
@@ -18,7 +16,7 @@ class ConfluenceClientTest extends TestCase
     public function testCanUseCustomClientBuilder(): void
     {
         $builder = $this->createMock(Builder::class);
-        $builder->expects($this->once())
+        $builder->expects(static::once())
             ->method('getHttpClient');
         $builder->method('getUriFactory')->willReturn(Psr17FactoryDiscovery::findUriFactory());
 
@@ -29,10 +27,10 @@ class ConfluenceClientTest extends TestCase
     public function testCanUseBasicAuth(): void
     {
         $builder = $this->createMock(Builder::class);
-        $builder->expects($this->atLeast(2))
+        $builder->expects(static::atLeast(2))
             ->method('addPlugin');
 
-        $builder->expects($this->atLeast(2))
+        $builder->expects(static::atLeast(2))
             ->method('removePlugin');
 
         $builder->method('getUriFactory')->willReturn(Psr17FactoryDiscovery::findUriFactory());
@@ -44,10 +42,10 @@ class ConfluenceClientTest extends TestCase
     public function testCanUseAuth(): void
     {
         $builder = $this->createMock(Builder::class);
-        $builder->expects($this->atLeast(2))
+        $builder->expects(static::atLeast(2))
             ->method('addPlugin');
 
-        $builder->expects($this->atLeast(2))
+        $builder->expects(static::atLeast(2))
             ->method('removePlugin');
 
         $builder->method('getUriFactory')->willReturn(Psr17FactoryDiscovery::findUriFactory());
@@ -59,10 +57,10 @@ class ConfluenceClientTest extends TestCase
     public function testCanUseUsernameAndPasswortInUri(): void
     {
         $builder = $this->createMock(Builder::class);
-        $builder->expects($this->exactly(4))
+        $builder->expects(static::exactly(4))
             ->method('addPlugin');
 
-        $builder->expects($this->exactly(2))
+        $builder->expects(static::exactly(2))
             ->method('removePlugin');
 
         $urlFactory = $this->createMock(UriFactoryInterface::class);

@@ -9,8 +9,6 @@ use CloudPlayDev\ConfluenceClient\Entity\ContentSearchResult;
 use CloudPlayDev\ConfluenceClient\Entity\ContentBody;
 use CloudPlayDev\ConfluenceClient\Entity\Hydratable;
 use CloudPlayDev\ConfluenceClient\Exception\ConfluencePhpClientException;
-use CloudPlayDev\ConfluenceClient\Exception\HttpServerException;
-use CloudPlayDev\ConfluenceClient\Exception\HydrationException;
 use Http\Client\Exception as HttpClientException;
 use JsonException;
 use Psr\Http\Message\ResponseInterface;
@@ -84,9 +82,7 @@ class Content extends AbstractApi
     public function find(array $searchParameter, ?int $limit = null, ?int $start = null): ContentSearchResult
     {
         $allowedSearchParameter = ['title', 'spaceKey', 'type', 'id'];
-        $queryParameter = array_filter($searchParameter, static function (string $searchKey) use ($allowedSearchParameter) {
-            return in_array($searchKey, $allowedSearchParameter, true);
-        }, ARRAY_FILTER_USE_KEY);
+        $queryParameter = array_filter($searchParameter, static fn(string $searchKey): bool => in_array($searchKey, $allowedSearchParameter, true), ARRAY_FILTER_USE_KEY);
 
         $queryParameter['expand'] = self::DEFAULT_EXPAND;
 
@@ -161,9 +157,7 @@ class Content extends AbstractApi
         ];
 
         if (count($content->getAncestors()) > 0) {
-            $ancestorsData = array_map(static function (int $id) {
-                return ['id' => $id];
-            }, $content->getAncestors());
+            $ancestorsData = array_map(static fn(int $id) => ['id' => $id], $content->getAncestors());
 
             $data['ancestors'] = $ancestorsData;
         }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace CloudPlayDev\Tests\ConfluenceClient\Entity;
 
 use CloudPlayDev\ConfluenceClient\Entity\ContentHistory;
+use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 
 class ContentHistoryTest extends TestCase
@@ -18,8 +19,8 @@ class ContentHistoryTest extends TestCase
         $contentHistory = ContentHistory::load($data);
 
         self::assertInstanceOf(ContentHistory::class, $contentHistory);
-        self::assertInstanceOf(\DateTimeImmutable::class, $contentHistory->getCreatedDate());
-        self::assertInstanceOf(\DateTimeImmutable::class, $contentHistory->getUpdatedDate());
+        self::assertInstanceOf(DateTimeImmutable::class, $contentHistory->getCreatedDate());
+        self::assertInstanceOf(DateTimeImmutable::class, $contentHistory->getUpdatedDate());
         self::assertTrue($contentHistory->isLatest());
 
         self::assertSame('atlassian', $contentHistory->getCreatedBy()->getAccountType());
