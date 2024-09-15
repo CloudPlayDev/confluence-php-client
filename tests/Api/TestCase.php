@@ -26,7 +26,7 @@ abstract class TestCase extends BaseTestCase
      *
      * @return MockObject|Content
      */
-    protected function getApiMock(array $methods = []): MockObject
+    protected function getApiMock(array $methods = []): MockObject|Content
     {
         $httpClient = $this->getMockBuilder(ClientInterface::class)
             ->onlyMethods(['sendRequest'])
@@ -50,7 +50,8 @@ abstract class TestCase extends BaseTestCase
      * @param string $contentType
      * @return mixed|MockObject|ResponseInterface
      */
-    protected function createResponse(string $responseString, int $responseCode = 200, string $contentType = 'application/json') {
+    protected function createResponse(string $responseString, int $responseCode = 200, string $contentType = 'application/json'): mixed
+    {
 
         $streamInterface = $this->createMock(StreamInterface::class);
         $streamInterface->method('getContents')->willReturn($responseString);

@@ -271,7 +271,7 @@ abstract class AbstractContent implements Hydratable
      * @return AbstractContent|ContentPage|ContentComment
      * @throws HydrationException
      */
-    public static function load(array $data): self
+    public static function load(array $data): ContentComment|AbstractContent|ContentPage
     {
         /* handle older content versions */
         if(isset($data['content'], $data['when'])) {
@@ -284,16 +284,11 @@ abstract class AbstractContent implements Hydratable
             $data['_links']['self']));
         Assert::string($data['type']);
 
-        switch ($data['type']) {
-            case Content::CONTENT_TYPE_PAGE:
-                $content = new ContentPage();
-                break;
-            case Content::CONTENT_TYPE_COMMENT:
-                $content = new ContentComment();
-                break;
-            default:
-                throw new HydrationException('Invalid content type: ' . $data['type']);
-        }
+        $content = match ($data['type']) {
+            Content::CONTENT_TYPE_PAGE => new ContentPage(),
+            Content::CONTENT_TYPE_COMMENT => new ContentComment(),
+            default => throw new HydrationException('Invalid content type: ' . $data['type']),
+        };
 
         $content->setId((int)$data['id']);
         $content->setTitle((string)$data['title']);

@@ -11,8 +11,8 @@ use CloudPlayDev\ConfluenceClient\Exception\ConfluencePhpClientException;
 use CloudPlayDev\ConfluenceClient\Exception\HttpClientException;
 use CloudPlayDev\ConfluenceClient\Exception\HttpServerException;
 use Http\Client\Exception;
+use JsonException;
 use Webmozart\Assert\InvalidArgumentException;
-use function PHPUnit\Framework\assertEquals;
 
 class ContentTest extends TestCase
 {
@@ -303,6 +303,52 @@ class ContentTest extends TestCase
         self::assertInstanceOf(ContentPage::class, $page);
     }
 
+    public function testCanCreatePageWithAncestorsAndContainer(): void
+    {
+        $api = $this->getApiMock();
+
+        $data = [
+            'type' => 'page',
+            'title' => 'Test',
+            'space' => [
+                'key' => 'KEY'
+            ],
+            'body' => [
+                'storage' => [
+                    'value' => 'my text',
+                    'representation' => 'storage'
+                ]
+            ],
+            'ancestors' => [
+                ['id' => 1],
+                ['id' => 2],
+                ['id' => 3]
+            ],
+            'container' => [
+                'id' => 123,
+                'type' => 'blogpost'
+            ]
+        ];
+
+        $api->expects(self::once())
+            ->method('httpPost')
+            ->with('content', [], $data)
+            ->willReturn($this->createResponse(json_encode(self::PAGE_CONTENT, JSON_THROW_ON_ERROR)));
+
+        $content = new ContentPage();
+        $content->setTitle('Test');
+        $content->setVersion(1);
+        $content->setContent('my text');
+        $content->setSpace('KEY');
+        $content->setContainerId(123);
+        $content->setContainerType('blogpost');
+        $content->setAncestors([1, 2, 3]);
+
+        $page = $api->create($content);
+
+        self::assertInstanceOf(ContentPage::class, $page);
+    }
+
     public function testCantCreateSavedPage(): void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -350,7 +396,7 @@ class ContentTest extends TestCase
     /**
      * @throws Exception
      * @throws ConfluencePhpClientException
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function testCanExtractErrorMessageFromResponse(): void
     {

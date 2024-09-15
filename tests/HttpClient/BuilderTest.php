@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace CloudPlayDev\Tests\ConfluenceClient\HttpClient;
 
 use CloudPlayDev\ConfluenceClient\HttpClient\Builder;
-use Http\Client\Common\HttpMethodsClientInterface;
 use Http\Client\Common\Plugin;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
@@ -21,9 +21,9 @@ class BuilderTest extends TestCase
     private Builder $subject;
 
     /**
-     * @var mixed|\PHPUnit\Framework\MockObject\MockObject|UriFactoryInterface
+     * @var mixed|MockObject|UriFactoryInterface
      */
-    private $uriFactory;
+    private mixed $uriFactory;
 
     /**
      * @before

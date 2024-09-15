@@ -20,7 +20,7 @@ class HttpClientException extends ConfluencePhpClientException
 
     public static function badRequest(ResponseInterface $response): HttpClientException
     {
-        $validationMessage = self::extractValidationMessage($response, 'message');
+        $validationMessage = self::extractValidationMessage($response);
 
         $message = sprintf("The parameters passed to the API were invalid. Check your inputs!\n\n%s", $validationMessage);
 
@@ -59,7 +59,7 @@ class HttpClientException extends ConfluencePhpClientException
 
     public static function forbidden(ResponseInterface $response): HttpClientException
     {
-        $validationMessage = self::extractValidationMessage($response, 'message');
+        $validationMessage = self::extractValidationMessage($response);
 
         $message = sprintf("Forbidden!\n\n%s", $validationMessage);
 
@@ -71,7 +71,7 @@ class HttpClientException extends ConfluencePhpClientException
      * @param string $jsonField
      * @return string
      */
-    private static function extractValidationMessage(ResponseInterface $response, string $jsonField): string
+    private static function extractValidationMessage(ResponseInterface $response, string $jsonField = 'message'): string
     {
 
         $validationMessage = $response->getBody()->getContents();
@@ -84,7 +84,7 @@ class HttpClientException extends ConfluencePhpClientException
                 Assert::string($jsonDecoded[$jsonField]);
                 $validationMessage = $jsonDecoded[$jsonField];
             }
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             return $validationMessage;
         }
 
