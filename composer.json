@@ -1,7 +1,6 @@
 {
   "name": "cloudplaydev/confluence-php-client",
   "description": "Provides methods for Confluence REST APIs",
-  "version": "0.6.0",
   "license": "MIT",
   "keywords": [
     "Atlassian",
