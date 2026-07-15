@@ -268,10 +268,10 @@ abstract class AbstractContent implements Hydratable
 
     /**
      * @param mixed[] $data
-     * @return AbstractContent|ContentPage|ContentComment
+     * @return AbstractContent|ContentPage|ContentComment|ContentAttachment
      * @throws HydrationException
      */
-    public static function load(array $data): ContentComment|AbstractContent|ContentPage
+    public static function load(array $data): ContentComment|AbstractContent|ContentPage|ContentAttachment
     {
         /* handle older content versions */
         if(isset($data['content'], $data['when'])) {
@@ -287,6 +287,7 @@ abstract class AbstractContent implements Hydratable
         $content = match ($data['type']) {
             Content::CONTENT_TYPE_PAGE => new ContentPage(),
             Content::CONTENT_TYPE_COMMENT => new ContentComment(),
+            Content::CONTENT_TYPE_ATTACHMENT => new ContentAttachment(),
             default => throw new HydrationException('Invalid content type: ' . $data['type']),
         };
 
